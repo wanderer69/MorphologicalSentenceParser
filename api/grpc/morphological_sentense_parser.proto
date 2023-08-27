@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package MorphologicalSentenceParser;
+option go_package = "../../pkg/server/grpc/morphological_parser";
+
+service MorphologicalSentenceParser {
+  rpc PutSentenceToParsing (PutSentenceToParsingRequest) returns (PutSentenceToParsingResponse) {}
+  rpc GetResultSentenceParsing (GetResultSentenceParsingRequest) returns (GetResultSentenceParsingResponse) {}
+}
+
+message PutSentenceToParsingRequest {
+  string client_id = 1;
+  string sentence = 2;
+}
+
+message PutSentenceToParsingResponse {
+  string client_id = 1;
+  string task_id = 2;
+}
+
+message GetResultSentenceParsingRequest {
+  string task_id = 1;
+}
+
+message GetResultSentenceParsingResponse {
+  string client_id = 1;
+  repeated TranslateSentensesResultItem result = 2;
+}
+
+message WordData {
+  string  Rel = 1;
+  string  Pos = 2;
+  map<string, string>  Feats = 3;
+  string  Start = 4;
+  string  Stop = 5;
+  string  Text = 6;
+  string  Lemma = 7;
+  string  Id = 8;
+  string  Head_id = 9;
+  int32  IdN = 10;
+  int32  SidN = 11;
+  int32  HeadIdN = 12;
+  int32  SheadIdN = 13;
+}
+
+message Relation {
+  int32 ID = 1;
+  string Type = 2;   
+  string ValuePtr = 3;    // предлог
+  string Value = 4;       // значение
+  int32 Relation = 5; // связь
+  int32 WordNum = 6;
+}
+
+message TranslateSentensesResultItem {
+  string Sentence = 1;
+  repeated WordData WordDatas = 2;
+  repeated Relation Relations = 3;
+}
