@@ -1,8 +1,15 @@
 package worker
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/wanderer69/MorphologicalSentenceParser/internal/natasha"
 	"github.com/wanderer69/MorphologicalSentenceParser/internal/relations"
+	"github.com/wanderer69/MorphologicalSentenceParser/internal/script"
+	"github.com/wanderer69/debug"
+	"github.com/wanderer69/tools/parser/parser"
+	"github.com/wanderer69/tools/parser/print"
 	process "github.com/wanderer69/tools/worker"
 )
 
@@ -17,15 +24,47 @@ type payload struct {
 }
 type payloadOut struct {
 	tsris []*relations.TranslateSentensesResultItem
+	// fileRules string
 }
 
 func NewProcessor() *Processor {
+	debug.NewDebug()
+
+	env := parser.NewEnv()
+	buffer := ""
+	o := print.NewOutput(func(sfmt string, args ...any) {
+		s := fmt.Sprintf(sfmt, args...)
+		buffer = buffer + s
+	})
+
+	script.MakeRules(env)
+
 	n := natasha.NewNatasha("../../scripts/python")
-	rrs := relations.InitRelationRule()
+	//rrs := relations.InitRelationRule()
+	rules_file_name := os.Getenv("RULES_FILE_NAME")
+
+	if len(rules_file_name) == 0 {
+		rules_file_name = "./rules.script"
+	}
+	data, err := os.ReadFile(rules_file_name)
+	if err != nil {
+		panic(fmt.Errorf("failed load rules file name %v: %w", rules_file_name, err))
+	}
+
+	rEnv := script.NewEnvironment()
+	rp := script.RelationsParser{}
+	rp.Env = rEnv
+	env.Struct = &rp
+	env.Debug = 0
+
+	_, err = env.ParseString(string(data), o)
+	if err != nil {
+		panic(fmt.Errorf("failed parsing file name %v: %w", rules_file_name, err))
+	}
 
 	proc := &Processor{
 		n:   n,
-		rrs: rrs,
+		rrs: rp.Env.RelationRules,
 	}
 	proc.proc = process.NewProcess(proc, procFunc)
 	return proc
