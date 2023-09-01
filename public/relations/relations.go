@@ -7,11 +7,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	uuid "github.com/satori/go.uuid"
+	"github.com/wanderer69/debug"
 	"gopkg.in/yaml.v2"
 
-	uuid "github.com/satori/go.uuid"
 	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
-	"github.com/wanderer69/debug"
 )
 
 const (

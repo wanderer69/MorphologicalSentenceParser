@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
 	"github.com/wanderer69/debug"
+
+	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
 )
 
 func TestRelations(t *testing.T) {
