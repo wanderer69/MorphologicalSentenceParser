@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/natasha"
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/relations"
 	"github.com/wanderer69/MorphologicalSentenceParser/internal/script"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/relations"
 	"github.com/wanderer69/debug"
 	"github.com/wanderer69/tools/parser/parser"
 	"github.com/wanderer69/tools/parser/print"

@@ -9,7 +9,7 @@ import (
 	attr "github.com/wanderer69/tools/parser/attributes"
 	ns "github.com/wanderer69/tools/parser/new_strings"
 
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/relations"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/relations"
 	"github.com/wanderer69/tools/parser/parser"
 )
 

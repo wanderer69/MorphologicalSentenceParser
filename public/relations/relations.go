@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	uuid "github.com/satori/go.uuid"
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/natasha"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
 	"github.com/wanderer69/debug"
 )
 

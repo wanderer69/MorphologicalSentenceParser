@@ -7,9 +7,9 @@ import (
 	grpcGoogle "google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/natasha"
-	"github.com/wanderer69/MorphologicalSentenceParser/internal/relations"
 	pb "github.com/wanderer69/MorphologicalSentenceParser/pkg/server/grpc/morphological_parser"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/relations"
 )
 
 func GrpcInit(address string, port int) (*grpcGoogle.ClientConn, error) {
