@@ -20,11 +20,13 @@ type Processor struct {
 }
 
 type payload struct {
+	ClientID string
 	Sentence string
 }
 type payloadOut struct {
-	tsris []*relations.TranslateSentensesResultItem
-	// fileRules string
+	clientID string
+	tsris    []*relations.TranslateSentensesResultItem
+	result   string
 }
 
 func NewProcessor() *Processor {
@@ -67,6 +69,7 @@ func NewProcessor() *Processor {
 		rrs: rp.Env.RelationRules,
 	}
 	proc.proc = process.NewProcess(proc, procFunc)
+	proc.proc.Run()
 	return proc
 }
 
@@ -80,7 +83,7 @@ func procFunc(ei interface{}, pli interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	plo := &payloadOut{tsris: tsris}
+	plo := &payloadOut{clientID: pl.ClientID, tsris: tsris}
 	return plo, nil
 }
 
@@ -88,13 +91,14 @@ func (proc *Processor) Send(sentence string) (string, error) {
 	return proc.proc.Send(&payload{Sentence: sentence})
 }
 
-func (proc *Processor) Check(taskID string) ([]*relations.TranslateSentensesResultItem, error) {
-	plo, err := proc.proc.Check(taskID)
+func (proc *Processor) Check(taskID string) (string, string, []*relations.TranslateSentensesResultItem, error) {
+	ploi, result, err := proc.proc.Check(taskID)
 	if err != nil {
-		return nil, err
+		return "", result, nil, err
 	}
-	if plo != nil {
-		return plo.(*payloadOut).tsris, nil
+	if ploi != nil {
+		plo := ploi.(*payloadOut)
+		return plo.clientID, result, plo.tsris, nil
 	}
-	return nil, nil
+	return "", result, nil, nil
 }

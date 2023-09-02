@@ -33,13 +33,13 @@ func (s *Server) PutSentenceToParsing(ctx context.Context, request *pb.PutSenten
 func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetResultSentenceParsingRequest) (*pb.GetResultSentenceParsingResponse, error) {
 	response := &pb.GetResultSentenceParsingResponse{}
 
-	tsris, err := s.proc.Check(request.TaskId)
+	clientID, resultCheck, tsris, err := s.proc.Check(request.TaskId)
 	if err == nil {
 		return nil, err
 	}
 	results := []*pb.TranslateSentensesResultItem{}
 	for i := range tsris {
-		r := response.Result[i]
+		r := tsris[i]
 		result := &pb.TranslateSentensesResultItem{
 			Sentence: r.Sentence,
 		}
@@ -55,13 +55,13 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 		}
 		for j := range r.Relations {
 			rr := r.Relations[j]
-			if rr.Relation > -1 {
-				result.Relations[j] = result.Relations[rr.Relation]
+			if rr.Relation != nil {
+				result.Relations[j] = result.Relations[rr.Relation.WordNum]
 			}
 		}
 		WordDatas := []*pb.WordData{}
-		for j := range r.WordDatas {
-			wd := r.WordDatas[j]
+		for j := range r.WordsData {
+			wd := r.WordsData[j]
 			WordsData := pb.WordData{
 				Rel:      wd.Rel,
 				Pos:      wd.Pos,
@@ -71,7 +71,7 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 				Text:     wd.Text,
 				Lemma:    wd.Lemma,
 				Id:       wd.Id,
-				HeadId:   wd.HeadId,
+				HeadId:   wd.HeadID,
 				IdN:      int32(wd.IdN),
 				SidN:     int32(wd.SidN),
 				HeadIdN:  int32(wd.HeadIdN),
@@ -82,6 +82,8 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 		result.WordDatas = WordDatas
 		results = append(results, result)
 	}
-	response.Result = results
+	response.ClientId = clientID
+	response.TranslateSentenceResult = results
+	response.Result = resultCheck
 	return response, nil
 }

@@ -55,8 +55,8 @@ func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) ([]*relations.T
 		return nil, err
 	}
 	results := []*relations.TranslateSentensesResultItem{}
-	for i := range response.Result {
-		r := response.Result[i]
+	for i := range response.TranslateSentenceResult {
+		r := response.TranslateSentenceResult[i]
 		result := &relations.TranslateSentensesResultItem{
 			Sentence: r.Sentence,
 		}

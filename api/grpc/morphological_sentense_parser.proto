@@ -24,7 +24,8 @@ message GetResultSentenceParsingRequest {
 
 message GetResultSentenceParsingResponse {
   string client_id = 1;
-  repeated TranslateSentensesResultItem result = 2;
+  repeated TranslateSentensesResultItem translate_sentence_result = 2;
+  string result = 3;
 }
 
 message WordData {
