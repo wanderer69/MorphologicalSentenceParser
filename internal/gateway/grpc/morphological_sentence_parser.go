@@ -55,8 +55,9 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 		}
 		for j := range r.Relations {
 			rr := r.Relations[j]
+			result.Relations[j].Relation = -1
 			if rr.Relation != nil {
-				result.Relations[j] = result.Relations[rr.Relation.WordNum]
+				result.Relations[j].Relation = int32(rr.Relation.WordNum)
 			}
 		}
 		WordDatas := []*pb.WordData{}
