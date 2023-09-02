@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	grpcGoogle "google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 
 	pb "github.com/wanderer69/MorphologicalSentenceParser/pkg/server/grpc/morphological_parser"
@@ -13,11 +14,15 @@ import (
 )
 
 func GrpcInit(address string, port int) (*grpcGoogle.ClientConn, error) {
-	opts := []grpcGoogle.DialOption{
-		// grpcGoogle.WithInsecure(),
-	}
+	/*
+		opts := []grpcGoogle.DialOption{
+			grpcGoogle.WithAuthority()
+			// grpcGoogle.WithInsecure(),
+		}
+	*/
 	ss := fmt.Sprintf("%v:%v", address, port) // 5300
-	conn, err := grpcGoogle.Dial(ss, opts...)
+	opts := grpcGoogle.WithTransportCredentials(insecure.NewCredentials())
+	conn, err := grpcGoogle.Dial(ss, opts)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 		return nil, err

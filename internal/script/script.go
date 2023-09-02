@@ -461,7 +461,7 @@ func fCondition(pi parser.ParseItem, env *parser.Env, level int) (string, error)
 					}
 
 				case attr.AttrTArray:
-					fmt.Printf("array %v %v\r\n", a, array)
+					//fmt.Printf("array %v %v\r\n", a, array)
 					if len(array) != 3 {
 						fmt.Printf("error - argument want have <field name>:<value> format, got %v", array)
 						return result, fmt.Errorf("error - argument want have <field name>:<value> format, got %v", array)
