@@ -43,7 +43,7 @@ func PutSentenceToParsing(conn *grpcGoogle.ClientConn, query string) (string, er
 	return response.TaskId, nil
 }
 
-func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) ([]*relations.TranslateSentensesResultItem, error) {
+func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) (string, []*relations.TranslateSentensesResultItem, error) {
 	client := pb.NewMorphologicalSentenceParserClient(conn)
 	request := &pb.GetResultSentenceParsingRequest{
 		TaskId: taskID,
@@ -52,7 +52,7 @@ func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) ([]*relations.T
 	response, err := client.GetResultSentenceParsing(context.Background(), request)
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
-		return nil, err
+		return response.Result, nil, err
 	}
 	results := []*relations.TranslateSentensesResultItem{}
 	for i := range response.TranslateSentenceResult {
@@ -97,5 +97,5 @@ func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) ([]*relations.T
 		}
 		results = append(results, result)
 	}
-	return results, nil
+	return response.Result, results, nil
 }

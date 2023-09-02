@@ -34,7 +34,7 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 	response := &pb.GetResultSentenceParsingResponse{}
 
 	clientID, resultCheck, tsris, err := s.proc.Check(request.TaskId)
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 	results := []*pb.TranslateSentensesResultItem{}
