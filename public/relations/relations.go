@@ -526,12 +526,14 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 
 			mm := re.posRRIA
 			if rria[mm].Type == mode {
-				if mode == "Object" {
-					fmt.Printf("%v\r\n", mode)
-				}
+				/*
+					if mode == "Object" {
+						fmt.Printf("%v\r\n", mode)
+					}
+				*/
 				isModeExists = true
 				rrcl := rria[mm].RelationRuleConditions
-				fmt.Printf("predicate re.pos_rria %v re.pos_in_rrc %v\r\n", re.posRRIA, re.posInRRC)
+				// fmt.Printf("predicate re.pos_rria %v re.pos_in_rrc %v\r\n", re.posRRIA, re.posInRRC)
 
 				if re.CheckRelationUse(rrcl[re.posInRRC], i) {
 					// fmt.Printf("CheckRelationUse true\r\n")
@@ -869,7 +871,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 						}
 					case 15:
 						//
-						fmt.Printf("predicate len(rrcl)- 1 > re.posInRRC %v\r\n", len(rrcl)-1 > re.posInRRC)
+						//fmt.Printf("predicate len(rrcl)- 1 > re.posInRRC %v\r\n", len(rrcl)-1 > re.posInRRC)
 						if len(rrcl)-1 > re.posInRRC {
 							// изменяем состояние и выходим
 							p := Pair{mm, re.posInRRC, i}
@@ -1010,7 +1012,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 	for {
 		debug.Alias("level0").Printf("gstate %v, mode %v re.pos %v re.pos_rria %v\r\n", gstate, mode, re.pos, re.posRRIA)
 		debug.Alias("level0.1").Printf("re %#v\r\n", re)
-		fmt.Printf("re %v\r\n", re.RelationsUse)
+		//fmt.Printf("re %v\r\n", re.RelationsUse)
 		switch gstate {
 		case 0:
 			if re.pos == 0 {
