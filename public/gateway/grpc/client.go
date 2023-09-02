@@ -62,18 +62,18 @@ func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) (string, []*rel
 		}
 		for j := range r.Relations {
 			rr := r.Relations[j]
-			res := &relations.Relation{
+			res := relations.Relation{
 				Type:     rr.Type,
 				ValuePtr: rr.ValuePtr,
 				Value:    rr.Type,
 				WordNum:  int(rr.WordNum),
 			}
-			result.Relations = append(result.Relations, res)
+			result.Relations = append(result.Relations, &res)
 		}
 		for j := range r.Relations {
 			rr := r.Relations[j]
 			if rr.Relation > -1 {
-				result.Relations[j] = result.Relations[rr.Relation]
+				result.Relations[j].Relation = result.Relations[rr.Relation]
 			}
 		}
 		for j := range r.WordDatas {
