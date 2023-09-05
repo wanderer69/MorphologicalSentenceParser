@@ -48,7 +48,7 @@ func (s *Server) GetResultSentenceParsing(ctx context.Context, request *pb.GetRe
 			res := &pb.Relation{
 				Type:     rr.Type,
 				ValuePtr: rr.ValuePtr,
-				Value:    rr.Type,
+				Value:    rr.Value,
 				WordNum:  int32(rr.WordNum),
 			}
 			result.Relations = append(result.Relations, res)
