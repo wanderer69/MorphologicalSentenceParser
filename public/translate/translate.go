@@ -13,7 +13,8 @@ type Translate struct {
 
 func NewTranslate() *Translate {
 	debug.NewDebug()
-	// debug.LoadFromFile("../../cmd/cli/debug.cfg")
+	//debug.LoadFromFile("../../cmd/cli/debug.cfg")
+
 	n := natasha.NewNatasha("../../scripts/python")
 	rrs := relations.InitRelationRule()
 	return &Translate{
