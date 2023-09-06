@@ -22,6 +22,10 @@ func NewTranslate() *Translate {
 	}
 }
 
+func (t *Translate) SetRRS(rrs *relations.RelationRules) {
+	t.rrs = rrs
+}
+
 func (t *Translate) Translate(sentence string) ([]*relations.TranslateSentensesResultItem, error) {
 	tsris, err := relations.TranslateSentense(t.n, t.rrs, sentence, 0)
 	return tsris, err
