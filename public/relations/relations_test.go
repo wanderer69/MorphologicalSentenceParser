@@ -42,7 +42,7 @@ func TestTranslateSentense(t *testing.T) {
 	n := natasha.NewNatasha("../../scripts/python")
 	defer n.Close()
 	rrs := InitRelationRule()
-	tsris, err := TranslateSentense(n, rrs, "студент собрал дом из деталей.", 0)
+	tsris, err := TranslateText(n, rrs, "студент собрал дом из деталей.", 0)
 	require.NoError(t, err)
 	tsri := TranslateSentensesResultItem{
 		Sentence: "студент собрал дом из деталей.",

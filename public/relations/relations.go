@@ -1062,7 +1062,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 				// в стеке есть запись, выбираем ее
 				pos_n := re.dataStack[0]
 				// возвращаем текущее слово
-				re.pos = pos_n
+				re.pos = pos_n + 1 // было без инкремента.
 			}
 			re.dataStack = []int{}
 			if re.posRRIA == 0 {
@@ -1312,8 +1312,9 @@ type TranslateSentensesResultItem struct {
 	Relations []*Relation
 }
 
-func TranslateSentense(n *natasha.Natasha, rrs *RelationRules, str_in string, debug int) ([]*TranslateSentensesResultItem, error) {
+func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug int) ([]*TranslateSentensesResultItem, error) {
 	lines_list := strings.Split(str_in, "\n")
+	isPrint := false
 
 	tsris := []*TranslateSentensesResultItem{}
 	for i := 0; i < len(lines_list); i++ {
@@ -1334,10 +1335,12 @@ func TranslateSentense(n *natasha.Natasha, rrs *RelationRules, str_in string, de
 				if err != nil {
 					return nil, err
 				}
-				for i := range rels {
-					fmt.Printf("rels %#v\r\n", rels[i])
-					if rels[i].Relation != nil {
-						fmt.Printf("\t %#v\r\n", rels[i].Relation)
+				if isPrint {
+					for i := range rels {
+						fmt.Printf("rels %#v\r\n", rels[i])
+						if rels[i].Relation != nil {
+							fmt.Printf("\t %#v\r\n", rels[i].Relation)
+						}
 					}
 				}
 				tsri := TranslateSentensesResultItem{
@@ -1350,6 +1353,38 @@ func TranslateSentense(n *natasha.Natasha, rrs *RelationRules, str_in string, de
 		}
 	}
 	return tsris, nil
+}
+
+func TranslateSentence(n *natasha.Natasha, rrs *RelationRules, sentence string, debug int) (*TranslateSentensesResultItem, error) {
+	isPrint := false
+	line := strings.TrimSpace(sentence)
+	line = strings.ToLower(line)
+	if len(line) > 0 {
+		res, err := n.ParseSentence(line)
+		if err != nil {
+			return nil, err
+		}
+		var rels []*Relation
+		rels, err = CheckRelationByRule(rrs, res)
+		if err != nil {
+			return nil, err
+		}
+		if isPrint {
+			for i := range rels {
+				fmt.Printf("rels %#v\r\n", rels[i])
+				if rels[i].Relation != nil {
+					fmt.Printf("\t %#v\r\n", rels[i].Relation)
+				}
+			}
+		}
+		tsri := &TranslateSentensesResultItem{
+			Sentence:  line,
+			WordsData: res,
+			Relations: rels,
+		}
+		return tsri, nil
+	}
+	return nil, fmt.Errorf("empty sentence")
 }
 
 func TablePrint(rows []Row, args ...interface{}) []Row {

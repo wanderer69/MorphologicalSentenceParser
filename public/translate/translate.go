@@ -27,7 +27,12 @@ func (t *Translate) SetRRS(rrs *relations.RelationRules) {
 	t.rrs = rrs
 }
 
-func (t *Translate) Translate(sentence string) ([]*relations.TranslateSentensesResultItem, error) {
-	tsris, err := relations.TranslateSentense(t.n, t.rrs, sentence, 0)
+func (t *Translate) TranslateText(sentence string, debug int) ([]*relations.TranslateSentensesResultItem, error) {
+	tsris, err := relations.TranslateText(t.n, t.rrs, sentence, 0)
 	return tsris, err
+}
+
+func (t *Translate) TranslateSentence(sentence string, debug int) (*relations.TranslateSentensesResultItem, error) {
+	tsri, err := relations.TranslateSentence(t.n, t.rrs, sentence, 0)
+	return tsri, err
 }

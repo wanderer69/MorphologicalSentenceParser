@@ -78,7 +78,7 @@ func procFunc(ei interface{}, pli interface{}) (interface{}, error) {
 	pl := pli.(*payload)
 
 	//defer n.Close()
-	tsris, err := relations.TranslateSentense(proc.n, proc.rrs, pl.Sentence, 0)
+	tsris, err := relations.TranslateText(proc.n, proc.rrs, pl.Sentence, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -92,13 +92,13 @@ func (proc *Processor) Send(sentence string) (string, error) {
 }
 
 func (proc *Processor) Check(taskID string) (string, string, []*relations.TranslateSentensesResultItem, error) {
-	ploi, result, err := proc.proc.Check(taskID)
+	ploi, err := proc.proc.Check(taskID)
 	if err != nil {
-		return "", result, nil, err
+		return "", "error", nil, err
 	}
 	if ploi != nil {
 		plo := ploi.(*payloadOut)
-		return plo.clientID, result, plo.tsris, nil
+		return plo.clientID, "Ok", plo.tsris, nil
 	}
-	return "", result, nil, nil
+	return "", "", nil, nil
 }
