@@ -519,9 +519,6 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 		r = nil
 		isModeExists := false
 		debug.Alias("level1.1").Printf("predicate mode %v wd[i] %v %v pos_in_rrc %v re.pos_rria %v\r\n", mode, wd[i].Text, wd[i].Rel, re.posInRRC, re.posRRIA)
-		//fmt.Printf("predicate i %v\r\n", i)
-		//fmt.Printf("predicate %v %v\r\n", i, wd[i].Text)
-		//fmt.Printf("predicate %v %v \r\n", i, wd[i].Rel)
 		for {
 			state := 0
 			ptr := -1
@@ -1021,10 +1018,6 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 			if re.pos == 0 {
 				incrementRelations = len(re.Relations)
 			}
-			if len(wd) == re.pos {
-				flag_stop = true
-				break
-			}
 			predicate(modes[mode], rrs.Main, re.pos, re)
 			debug.Alias("level0").Printf("re.state %v\r\n", re.state)
 			switch re.state {
@@ -1070,26 +1063,6 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 				pos_n := re.dataStack[0]
 				// возвращаем текущее слово
 				re.pos = pos_n + 1 // было без инкремента.
-				if len(wd)-1 > re.pos {
-					//re.pos = re.pos + 1
-					re.state = -1
-				} else {
-					newIncrementRelations := len(re.Relations)
-					//fmt.Printf("newIncrementRelations %v, incrementRelations %v, newIncrementRelations == incrementRelations %v\r\n", newIncrementRelations, incrementRelations, newIncrementRelations == incrementRelations)
-					if newIncrementRelations == incrementRelations {
-						// иначе меняем моду
-						if len(modes)-1 > mode {
-							mode = mode + 1
-							re.pos = 0
-							re.state = -1
-						} else {
-							flag_stop = true
-						}
-					} else {
-						re.pos = 0
-						re.state = -1
-					}
-				}
 			}
 			re.dataStack = []int{}
 			if re.posRRIA == 0 {
