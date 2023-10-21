@@ -40,13 +40,14 @@ func InitUD() {
 	internalUniversalDependecies["cop"] = "связка"
 	internalUniversalDependecies["advcl"] = "модификатор_придаточного_предложения"
 	internalUniversalDependecies["mark"] = "маркер"
-	internalUniversalDependecies["expl"] = "ругательство"
+	internalUniversalDependecies["expl"] = "указательная_частица" // _как_«лишнее»_подлежащее
 	internalUniversalDependecies["cc"] = "координирующее_соединение"
 	internalUniversalDependecies["acl:relcl"] = "модификатор_относительного_предложения"
 	internalUniversalDependecies["csubj"] = "клаузальный_субъект"
 	internalUniversalDependecies["acl"] = "клаузальный_модификатор_существительного" // _придаточного_предложения
 	internalUniversalDependecies["nummod:gov"] = "числовой_модификатор_регулирующий_падеж_существительного"
 	internalUniversalDependecies["ccomp"] = "клаузальное_дополнение"
+	internalUniversalDependecies["appos"] = "аппозиционный_модификатор_существительного"
 }
 
 func Tag2strByUniversalDependecies(tag string) string {
