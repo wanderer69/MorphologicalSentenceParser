@@ -43,11 +43,14 @@ func TestTranslateSentense(t *testing.T) {
 	defer n.Close()
 	rrs := InitRelationRule()
 	sentence := "студент собрал дом из деталей."
-	sentence = "руководство это  руководить"
+	//sentence = "руководство это  руководить"
 	tsris, err := TranslateText(n, rrs, sentence, 0)
 	require.NoError(t, err)
 	tsri := TranslateSentensesResultItem{
-		Sentence: "студент собрал дом из деталей.",
+		Sentence:    "студент собрал дом из деталей.",
+		RootPos:     1,
+		ObjectPos:   2,
+		RootBasePos: -1,
 		WordsData: []natasha.WordData{
 			{
 				Rel:      "номинальный_субъект",
