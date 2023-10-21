@@ -410,9 +410,9 @@ type ComplexPair struct {
 }
 
 type RelationEnv struct {
-	root     int
-	object   int
-	rootBase int
+	root     int // основа
+	object   int // объект
+	rootBase int // базовая основа
 
 	pos       int   // положение в списке данных
 	dataStack []int // стек положений в списке данных
@@ -441,6 +441,18 @@ func NewRelationEnv() *RelationEnv {
 	re.Variables = make(map[string]*VarValue)
 	re.RelationsUse = make(map[string]struct{})
 	return &re
+}
+
+func (re *RelationEnv) GetRERoot() int {
+	return re.root
+}
+
+func (re *RelationEnv) GetREObject() int {
+	return re.object
+}
+
+func (re *RelationEnv) GetRERootBase() int {
+	return re.rootBase
 }
 
 func (re *RelationEnv) AddRelationUse(rrc RelationRuleCondition, pos int) {
@@ -512,7 +524,7 @@ func remove[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation, error) {
+func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation, int, int, int, error) {
 	// функция предиката
 	predicate := func(mode string, rria []RelationRuleItem, i int, re *RelationEnv) *Relation {
 		var r *Relation
@@ -1176,7 +1188,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 			}
 			table, err := PrintTable(rows)
 			if err != nil {
-				return nil, err
+				return nil, -1, -1, -1, err
 			}
 			for i := range table {
 				fmt.Printf("%v\r\n", table[i])
@@ -1202,16 +1214,16 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 			}
 			table, err := PrintTable(rows)
 			if err != nil {
-				return nil, err
+				return nil, -1, -1, -1, err
 			}
 			for i := range table {
 				fmt.Printf("%v\r\n", table[i])
 			}
 		}
 		var relsCondition []*Relation
-		relsCondition, err := CheckRelationByRule(rrs, wdCondition)
+		relsCondition, _, _, _, err := CheckRelationByRule(rrs, wdCondition)
 		if err != nil {
-			return nil, err
+			return nil, -1, -1, -1, err
 		}
 		if isPrint {
 			for i := range relsCondition {
@@ -1222,9 +1234,9 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 			}
 		}
 		var relsMain []*Relation
-		relsMain, err = CheckRelationByRule(rrs, wdMain)
+		relsMain, _, _, _, err = CheckRelationByRule(rrs, wdMain)
 		if err != nil {
-			return nil, err
+			return nil, -1, -1, -1, err
 		}
 		if isPrint {
 			for i := range relsMain {
@@ -1246,7 +1258,10 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 			re.Relations = append(re.Relations, rc)
 		}
 	}
-	return re.Relations, nil
+	root := re.root
+	object := re.object
+	rootBase := re.rootBase
+	return re.Relations, root, object, rootBase, nil
 }
 
 func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string, fileNameOut string, debug int) error {
@@ -1294,7 +1309,7 @@ func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string,
 						fmt.Fprintf(f, "%v\r\n", table[i])
 					}
 					var rels []*Relation
-					rels, err = CheckRelationByRule(rrs, res)
+					rels, _, _, _, err = CheckRelationByRule(rrs, res)
 					if err != nil {
 						return err
 					}
@@ -1310,7 +1325,7 @@ func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string,
 						fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\t%v\r\n", i, res[i].Lemma, res[i].Rel, res[i].Pos, res[i].IdN, res[i].HeadIdN, res[i].Feats)
 					}
 					var rels []*Relation
-					rels, err = CheckRelationByRule(rrs, res)
+					rels, _, _, _, err = CheckRelationByRule(rrs, res)
 					if err != nil {
 						return err
 					}
@@ -1334,9 +1349,12 @@ func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string,
 }
 
 type TranslateSentensesResultItem struct {
-	Sentence  string
-	WordsData []natasha.WordData
-	Relations []*Relation
+	Sentence    string
+	WordsData   []natasha.WordData
+	Relations   []*Relation
+	RootPos     int
+	ObjectPos   int
+	RootBasePos int
 }
 
 func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug int) ([]*TranslateSentensesResultItem, error) {
@@ -1358,7 +1376,7 @@ func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug 
 					return nil, err
 				}
 				var rels []*Relation
-				rels, err = CheckRelationByRule(rrs, res)
+				rels, root, object, rootBase, err := CheckRelationByRule(rrs, res)
 				if err != nil {
 					return nil, err
 				}
@@ -1371,9 +1389,12 @@ func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug 
 					}
 				}
 				tsri := TranslateSentensesResultItem{
-					Sentence:  line,
-					WordsData: res,
-					Relations: rels,
+					Sentence:    line,
+					WordsData:   res,
+					Relations:   rels,
+					RootPos:     root,
+					ObjectPos:   object,
+					RootBasePos: rootBase,
 				}
 				tsris = append(tsris, &tsri)
 			}
@@ -1392,7 +1413,7 @@ func TranslateSentence(n *natasha.Natasha, rrs *RelationRules, sentence string, 
 			return nil, err
 		}
 		var rels []*Relation
-		rels, err = CheckRelationByRule(rrs, res)
+		rels, root, object, rootBase, err := CheckRelationByRule(rrs, res)
 		if err != nil {
 			return nil, err
 		}
@@ -1405,9 +1426,12 @@ func TranslateSentence(n *natasha.Natasha, rrs *RelationRules, sentence string, 
 			}
 		}
 		tsri := &TranslateSentensesResultItem{
-			Sentence:  line,
-			WordsData: res,
-			Relations: rels,
+			Sentence:    line,
+			WordsData:   res,
+			Relations:   rels,
+			RootPos:     root,
+			ObjectPos:   object,
+			RootBasePos: rootBase,
 		}
 		return tsri, nil
 	}
