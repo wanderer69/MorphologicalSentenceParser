@@ -541,11 +541,11 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 
 			mm := re.posRRIA
 			if rria[mm].Type == mode {
-
-				if mode == "Root" {
-					fmt.Printf("%v\r\n", mode)
-				}
-
+				/*
+					if mode == "Root" {
+						fmt.Printf("%v\r\n", mode)
+					}
+				*/
 				isModeExists = true
 				rrcl := rria[mm].RelationRuleConditions
 				// fmt.Printf("predicate re.pos_rria %v re.pos_in_rrc %v\r\n", re.posRRIA, re.posInRRC)
