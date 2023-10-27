@@ -549,9 +549,11 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 						fmt.Printf("%v\r\n", mode)
 					}
 				*/
-				if mode == "Pre" {
-					fmt.Printf("%v\r\n", mode)
-				}
+				/*
+					if mode == "Pre" {
+						fmt.Printf("%v\r\n", mode)
+					}
+				*/
 
 				isModeExists = true
 				rrcl := rria[mm].RelationRuleConditions
