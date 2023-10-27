@@ -17,15 +17,23 @@ func TestTranslateSentenseExt(t *testing.T) {
 	n := natasha.NewNatasha("../../scripts/python")
 	defer n.Close()
 	//rrs := InitRelationRule()
-	rrs, err := LoadRulesFromFile("/home/user/Go_projects/SemanticNet/data/rules.script")
+	rulesFileName := "/home/user/Go_projects/SemanticNet/data/rules.script"
+	//rulesFileName = "/home/user/Go_projects/SemanticNet/data/rules_short_root_это.script"
+	rrs, err := LoadRulesFromFile(rulesFileName)
 	require.NoError(t, err)
 
 	sentence := "студент собрал дом из деталей."
 	//sentence = "руководство это  руководить"
-	sentence = "хвост - это задняя, конечная часть чего-нибудь движущегося; вообще что-нибудь длинное, движущееся"
-	sentence = "хвост - это задняя конечная часть чего-нибудь движущегося; вообще что-нибудь длинное, движущееся"
-	sentence = "хвост - это задняя часть чего-нибудь движущегося."
-	//sentence = "хвост - это задняя часть летательного аппарата."
+	sentence = "хвост - задняя, конечная часть чего-нибудь движущегося; вообще что-нибудь длинное, движущееся"
+	//sentence = "хвост - задняя конечная часть чего-нибудь движущегося; вообще что-нибудь длинное, движущееся"
+	//sentence = "хвост - задняя часть чего-нибудь движущегося."
+	//sentence = "хвост - задняя часть летательного аппарата."
+	//sentence = "случайность - случайное обстоятельство"
+	sentence = "сущность - внутреннее содержание предмета, обнаруживщееся во внешних формах его существования"
+	sentence = "сущность -  суть"
+	sentence = "средство - прием, способ действия для достижения чего-нибудь"
+	sentence = "средство - приём или способ действия для достижения чего-нибудь"
+	//sentence = "средство - это способ действия для достижения чего-нибудь"
 
 	tsri, err := relations.TranslateSentence(n, rrs, sentence, 0)
 	require.NoError(t, err)

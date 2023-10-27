@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -115,8 +116,10 @@ type RelationRuleCondition struct {
 	Lemma        string // лемма
 	NoPretext    bool   // нет предлога
 
-	DependRelation string // зависимость от отношения
-	ID             string
+	DependRelation        string // зависимость от отношения
+	ID                    string
+	StrangePosition       string // непосредственная позиция в предложении
+	StrangeDependRelation string // прямая зависимость от отношения
 }
 
 func (rrc RelationRuleCondition) Print() string {
@@ -530,7 +533,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 		var r *Relation
 		r = nil
 		isModeExists := false
-		debug.Alias("level1.1").Printf("predicate mode %v wd[i] %v %v pos_in_rrc %v re.pos_rria %v\r\n", mode, wd[i].Text, wd[i].Rel, re.posInRRC, re.posRRIA)
+		debug.Alias("level1.1").Printf("\t\tpredicate mode %v wd[i] %v %v pos_in_rrc %v re.pos_rria %v\r\n", mode, wd[i].Text, wd[i].Rel, re.posInRRC, re.posRRIA)
 		//fmt.Printf("predicate i %v\r\n", i)
 		//fmt.Printf("predicate %v %v\r\n", i, wd[i].Text)
 		//fmt.Printf("predicate %v %v \r\n", i, wd[i].Rel)
@@ -546,6 +549,10 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 						fmt.Printf("%v\r\n", mode)
 					}
 				*/
+				if mode == "Pre" {
+					fmt.Printf("%v\r\n", mode)
+				}
+
 				isModeExists = true
 				rrcl := rria[mm].RelationRuleConditions
 				// fmt.Printf("predicate re.pos_rria %v re.pos_in_rrc %v\r\n", re.posRRIA, re.posInRRC)
@@ -871,7 +878,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 										//fmt.Printf("wd[j] %#v, rr.Pretext %v, wd[j].Text == rr.Pretext %v\r\n", wd[j], rr.Pretext, wd[j].Text == rr.Pretext)
 										if wd[j].Lemma == rr.Pretext {
 											ptr = j
-											state = 15
+											state = 11
 											flag = false
 											break
 										}
@@ -882,8 +889,44 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 								state = 20
 							}
 						} else {
+							state = 11
+						}
+
+					case 11:
+						if len(rr.StrangePosition) > 0 {
+							// надо проверить что может быть непосредственная позиция
+							state = 20
+							spos, err := strconv.ParseInt(rr.StrangePosition, 10, 32)
+							if err == nil {
+								if wd[i].IdN == int(spos) {
+									state = 12
+								}
+							}
+						} else {
+							state = 12
+						}
+
+					case 12:
+						//fmt.Printf("rr.DependRelation %v\r\n", rr.DependRelation)
+						if len(rr.StrangeDependRelation) > 0 {
+							flag := true
+							// ищем зависимость до
+							for j := 0; j < len(wd)-1; j++ {
+								//fmt.Printf("rr.DependRelation %v, wd[j].Rel %v\r\n", rr.DependRelation, wd[j].Rel)
+								if rr.StrangeDependRelation == wd[j].Rel {
+									ptr = j
+									state = 15
+									flag = false
+									break
+								}
+							}
+							if flag {
+								state = 20
+							}
+						} else {
 							state = 15
 						}
+
 					case 15:
 						//
 						//fmt.Printf("predicate len(rrcl)- 1 > re.posInRRC %v\r\n", len(rrcl)-1 > re.posInRRC)
@@ -1025,8 +1068,8 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 	flag_stop := false
 	incrementRelations := 0
 	for {
-		debug.Alias("level0").Printf("gstate %v, mode %v re.pos %v re.pos_rria %v\r\n", gstate, mode, re.pos, re.posRRIA)
-		debug.Alias("level0.1").Printf("re %#v\r\n", *re)
+		debug.Alias("level0").Printf("gstate %v, mode %v re.pos %v re.pos_rria %v\r\n", gstate, modes[mode], re.pos, re.posRRIA)
+		debug.Alias("level0.1").Printf("\tre %#v\r\n", *re)
 		//fmt.Printf("re %v\r\n", re.RelationsUse)
 		switch gstate {
 		case 0:
@@ -1038,7 +1081,7 @@ func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation
 				break
 			}
 			predicate(modes[mode], rrs.Main, re.pos, re)
-			debug.Alias("level0").Printf("re.state %v\r\n", re.state)
+			debug.Alias("level0").Printf("\tre.state %v\r\n", re.state)
 			switch re.state {
 			case -2:
 				// выполнилось условие можем либо остановить либо перейти к другим кодам

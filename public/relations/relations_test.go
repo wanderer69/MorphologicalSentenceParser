@@ -1,6 +1,7 @@
 package relations
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,7 @@ func TestRelationsStoreToScript(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestTranslateSentense(t *testing.T) {
+func TestTranslateText(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
@@ -156,4 +157,30 @@ func TestTranslateSentense(t *testing.T) {
 	}
 
 	require.Equal(t, *expectTsris[0], *tsris[0])
+}
+
+func TestTranslateSentense(t *testing.T) {
+	debug.NewDebug()
+	debug.LoadFromFile("../../cmd/cli/debug.cfg")
+
+	n := natasha.NewNatasha("../../scripts/python")
+	defer n.Close()
+	rrs := InitRelationRule()
+
+	sentence := "студент собрал дом из деталей."
+	//sentence = "руководство это  руководить"
+	tsri, err := TranslateSentence(n, rrs, sentence, 0)
+	require.NoError(t, err)
+
+	fmt.Printf("-------------------------------\r\n")
+	fmt.Printf("%v\r\n", tsri.Sentence)
+	fmt.Printf("root %v object %v rootBase %v\r\n", tsri.RootPos, tsri.ObjectPos, tsri.RootBasePos)
+	for j := range tsri.WordsData {
+		fmt.Printf("rel %v lemma %v POS %v case %v\r\n", tsri.WordsData[j].Rel, tsri.WordsData[j].Lemma, tsri.WordsData[j].Pos, tsri.WordsData[j].Feats["падеж"])
+	}
+	for j := range tsri.Relations {
+		fmt.Printf("%#v\r\n", tsri.Relations[j])
+	}
+
+	require.True(t, false)
 }

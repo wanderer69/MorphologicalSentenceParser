@@ -193,10 +193,12 @@ const (
 	ConditionTypeHaveObject   ConditionType = "имеет_объект"
 	ConditionTypeRootIs       ConditionType = "root_is"
 	//ConditionTypeFromRelation   ConditionType = ""
-	ConditionTypeLemma          ConditionType = "лемма"
-	ConditionTypeNoPretext      ConditionType = "нет_предлога"
-	ConditionTypeDependRelation ConditionType = "зависимость_от_отношения"
-	ConditionTypeID             ConditionType = "идентификатор"
+	ConditionTypeLemma             ConditionType = "лемма"
+	ConditionTypeNoPretext         ConditionType = "нет_предлога"
+	ConditionTypeDependRelation    ConditionType = "зависимость_от_отношения"
+	ConditionTypeID                ConditionType = "идентификатор"
+	ConditionStrangePosition       ConditionType = "непосредственная_позиция_в_предложении"
+	ConditionStrangeDependRelation ConditionType = "прямая_зависимость_от_отношения"
 )
 
 type ConditionTypes struct {
@@ -219,7 +221,8 @@ func NewConditionType() *ConditionTypes {
 	cts.dict["нет_предлога"] = ConditionTypeNoPretext
 	cts.dict["зависимость_от_отношения"] = ConditionTypeDependRelation
 	cts.dict["идентификатор"] = ConditionTypeID
-
+	cts.dict["непосредственная_позиция_в_предложении"] = ConditionStrangePosition
+	cts.dict["прямая_зависимость_от_отношения"] = ConditionStrangeDependRelation
 	return cts
 }
 
@@ -263,6 +266,10 @@ func (cts *ConditionTypes) Set(rrc *relations.RelationRuleCondition, ctv string,
 		rrc.DependRelation = value
 	case ConditionTypeID:
 		rrc.ID = value
+	case ConditionStrangePosition:
+		rrc.StrangePosition = value
+	case ConditionStrangeDependRelation:
+		rrc.StrangeDependRelation = value
 	}
 	return nil
 }
