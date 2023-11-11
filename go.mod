@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/wanderer69/OpCorpora v0.0.0-20230312104135-6cbd736b0eec
+	github.com/wanderer69/OpCorpora v0.0.0-20231111094634-28e8d4004d0d
 	github.com/wanderer69/debug v0.0.0-20230308140515-3e33c36ca2cd
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
@@ -22,8 +22,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/wanderer69/SmallDB v0.0.0-20221015073443-a8fb9088ef71 // indirect
-	github.com/wanderer69/tools v0.0.0-20230826142820-abc414525dac
+	github.com/wanderer69/SmallDB v0.0.0-20231104074339-55fe7b03596e // indirect
+	github.com/wanderer69/tools v0.0.0-20231006084641-5aadb735c19c
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect

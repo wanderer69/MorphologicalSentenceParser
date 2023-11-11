@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	ocorp "github.com/wanderer69/OpCorpora"
+	ocorp "github.com/wanderer69/OpCorpora/public/opcorpora"
 )
 
 type Natasha struct {

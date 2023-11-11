@@ -26,7 +26,7 @@ type payload struct {
 type payloadOut struct {
 	clientID string
 	tsris    []*relations.TranslateSentensesResultItem
-	result   string
+	//result   string
 }
 
 func NewProcessor() *Processor {
@@ -92,7 +92,7 @@ func (proc *Processor) Send(sentence string) (string, error) {
 }
 
 func (proc *Processor) Check(taskID string) (string, string, []*relations.TranslateSentensesResultItem, error) {
-	ploi, err := proc.proc.Check(taskID)
+	ploi, _, err := proc.proc.Check(taskID)
 	if err != nil {
 		return "", "error", nil, err
 	}
