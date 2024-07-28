@@ -8,8 +8,8 @@ import (
 /*
 #cgo windows CFLAGS: -IC:/DevelopmentSupport/Python38/include -Wstrict-prototypes -Wunused-variable
 #cgo windows LDFLAGS: -LC:/DevelopmentSupport/Python38/libs -lpython38
-#cgo linux CFLAGS: -I/usr/include/python3.8 -Wstrict-prototypes -Wunused-variable
-#cgo linux LDFLAGS: -L/usr/lib/python3.8/config-3.8-x86_64-linux-gnu -lpython3.8
+#cgo linux CFLAGS: -I/usr/include/python3.12 -Wstrict-prototypes -Wunused-variable
+#cgo linux LDFLAGS: -L/usr/lib/python3.12/config-3.12-x86_64-linux-gnu -lpython3.12
 #include "Python.h"
 static void AddModuleLocalPath(void) {
     PyObject *sys_path = PySys_GetObject("path");
