@@ -8,9 +8,10 @@ import (
 )
 
 func TestNewNatasha(t *testing.T) {
-	n := NewNatasha("../../scripts/python")
-	require.NotNil(t, n)
-	str := n.ExecParseSentence("лес растёт на холме")
+	n := NewNatasha()
+	require.NoError(t, n.Init())
+	str, err := n.ExecParseSentence("лес растёт на холме")
+	require.NoError(t, err)
 	fmt.Printf("%v", str)
 	require.True(t, len(str) > 0)
 	wordData, err := n.ParseSentence("лес растёт на холме")

@@ -261,8 +261,10 @@ func TestScriptTranslateRule(t *testing.T) {
 	//data, err := os.ReadFile("../../data/rules.script")
 	//require.NoError(t, err)
 
-	n := natasha.NewNatasha("")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
+
 	rrs := relations.InitRelationRule()
 	data := rrs.Print()
 	err := os.WriteFile("../../data/rules.script", []byte(data), 0644)

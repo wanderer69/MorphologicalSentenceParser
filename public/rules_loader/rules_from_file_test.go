@@ -14,8 +14,9 @@ func TestTranslateSentenseExt(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
-	n := natasha.NewNatasha("../../scripts/python")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
 	//rrs := InitRelationRule()
 	rulesFileName := "/home/user/Go_projects/SemanticNet/data/rules.script"
 	//rulesFileName = "/home/user/Go_projects/SemanticNet/data/rules_short_root_это.script"

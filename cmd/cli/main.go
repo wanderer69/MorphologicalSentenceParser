@@ -21,7 +21,7 @@ func main() {
 
 	flag.Parse()
 
-	n := natasha.NewNatasha("../scripts/python")
+	n := natasha.NewNatasha()
 	fmt.Printf("natasha loaded\r\n")
 	defer n.Close()
 	rrs := relations.InitRelationRule()

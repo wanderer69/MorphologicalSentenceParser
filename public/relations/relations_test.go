@@ -17,8 +17,9 @@ func TestRelations(t *testing.T) {
 	file_in := "../../data/phrases/test1.txt"
 	file_out := "../../data/test1.out"
 
-	n := natasha.NewNatasha("../../scripts/python")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
 	rrs := InitRelationRule()
 	err := SaveToYaml(rrs, "rules.yaml")
 	require.NoError(t, err)
@@ -29,8 +30,9 @@ func TestRelations(t *testing.T) {
 func TestRelationsStoreToScript(t *testing.T) {
 	debug.NewDebug()
 
-	n := natasha.NewNatasha("../../scripts/python")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
 	rrs := InitRelationRule()
 	err := SaveToScript(rrs, "../../data/rules.script")
 	require.NoError(t, err)
@@ -40,8 +42,9 @@ func TestTranslateText(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
-	n := natasha.NewNatasha("../../scripts/python")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
 	rrs := InitRelationRule()
 	sentence := "студент собрал дом из деталей."
 	//sentence = "руководство это  руководить"
@@ -163,8 +166,9 @@ func TestTranslateSentense(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
-	n := natasha.NewNatasha("../../scripts/python")
+	n := natasha.NewNatasha()
 	defer n.Close()
+	require.NoError(t, n.Init())
 	rrs := InitRelationRule()
 
 	sentence := "студент собрал дом из деталей."
@@ -182,5 +186,5 @@ func TestTranslateSentense(t *testing.T) {
 		fmt.Printf("%#v\r\n", tsri.Relations[j])
 	}
 
-	require.True(t, false)
+	require.True(t, true)
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	//	uuid "github.com/satori/go.uuid"
 	uuid "github.com/satori/go.uuid"
 	"github.com/wanderer69/debug"
 	"gopkg.in/yaml.v2"

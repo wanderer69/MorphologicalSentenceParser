@@ -14,9 +14,11 @@ import (
 )
 
 type Processor struct {
-	proc *process.Process
-	n    *natasha.Natasha
-	rrs  *relations.RelationRules
+	isHaveInit bool
+	proc       *process.Process
+	n          *natasha.Natasha
+	rrs        *relations.RelationRules
+	env        *parser.Env
 }
 
 type payload struct {
@@ -26,32 +28,15 @@ type payload struct {
 type payloadOut struct {
 	clientID string
 	tsris    []*relations.TranslateSentensesResultItem
-	//result   string
 }
 
 func NewProcessor() *Processor {
 	debug.NewDebug()
 
 	env := parser.NewEnv()
-	buffer := ""
-	o := print.NewOutput(func(sfmt string, args ...any) {
-		s := fmt.Sprintf(sfmt, args...)
-		buffer = buffer + s
-	})
-
 	script.MakeRules(env)
 
-	n := natasha.NewNatasha("../../scripts/python")
-	//rrs := relations.InitRelationRule()
-	rules_file_name := os.Getenv("RULES_FILE_NAME")
-
-	if len(rules_file_name) == 0 {
-		rules_file_name = "./rules.script"
-	}
-	data, err := os.ReadFile(rules_file_name)
-	if err != nil {
-		panic(fmt.Errorf("failed load rules file name %v: %w", rules_file_name, err))
-	}
+	n := natasha.NewNatasha()
 
 	rEnv := script.NewEnvironment()
 	rp := script.RelationsParser{}
@@ -59,18 +44,46 @@ func NewProcessor() *Processor {
 	env.Struct = &rp
 	env.Debug = 0
 
-	_, err = env.ParseString(string(data), o)
-	if err != nil {
-		panic(fmt.Errorf("failed parsing file name %v: %w", rules_file_name, err))
-	}
-
 	proc := &Processor{
 		n:   n,
+		env: env,
 		rrs: rp.Env.RelationRules,
 	}
-	proc.proc = process.NewProcess(proc, procFunc)
-	proc.proc.Run()
 	return proc
+}
+
+func (p *Processor) Init() error {
+	buffer := ""
+	o := print.NewOutput(func(sfmt string, args ...any) {
+		s := fmt.Sprintf(sfmt, args...)
+		buffer = buffer + s
+	})
+
+	script.MakeRules(p.env)
+
+	err := p.n.Init()
+	if err != nil {
+		return err
+	}
+	rules_file_name := os.Getenv("RULES_FILE_NAME")
+
+	if len(rules_file_name) == 0 {
+		rules_file_name = "./rules.script"
+	}
+	data, err := os.ReadFile(rules_file_name)
+	if err != nil {
+		return fmt.Errorf("failed load rules file name %v: %w", rules_file_name, err)
+	}
+
+	_, err = p.env.ParseString(string(data), o)
+	if err != nil {
+		return fmt.Errorf("failed parsing file name %v: %w", rules_file_name, err)
+	}
+
+	p.proc = process.NewProcess(p, procFunc)
+	p.proc.Run()
+	p.isHaveInit = true
+	return nil
 }
 
 func procFunc(ei interface{}, pli interface{}) (interface{}, error) {
@@ -88,10 +101,16 @@ func procFunc(ei interface{}, pli interface{}) (interface{}, error) {
 }
 
 func (proc *Processor) Send(sentence string) (string, error) {
+	if !proc.isHaveInit {
+		return "", fmt.Errorf("not initialized")
+	}
 	return proc.proc.Send(&payload{Sentence: sentence})
 }
 
 func (proc *Processor) Check(taskID string) (string, string, []*relations.TranslateSentensesResultItem, error) {
+	if !proc.isHaveInit {
+		return "", "", nil, fmt.Errorf("not initialized")
+	}
 	ploi, _, err := proc.proc.Check(taskID)
 	if err != nil {
 		return "", "error", nil, err

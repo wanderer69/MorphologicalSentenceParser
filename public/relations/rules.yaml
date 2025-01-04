@@ -1,0 +1,169 @@
+main:
+- type: Root
+  relationruleconditions:
+  - relation: основа
+    partofspeach: глагол_личная_форма
+    case: ""
+    control: zero
+    pretext: ""
+    animated: ""
+    haveobject: ""
+    rootis: []
+    fromrelation: ""
+    actions: []
+    lemma: ""
+    nopretext: false
+    dependrelation: ""
+    id: 0e793b53-171b-4085-bcaf-7b5dab87708c
+    strangeposition: ""
+    strangedependrelation: ""
+  relationtypes:
+  - relationtype: действие
+    usepretext: false
+    changeroot: 1
+    changeobject: 0
+    changerootbase: 0
+    iscomplex: false
+    iscondition: false
+    iscomma: false
+    isconsequence: false
+    iscomplicate: false
+    actions:
+    - cmd: SaveVar
+      args:
+      - root
+      - val
+    id: a5750a01-7df7-42c4-ba09-df984ad9d194
+  id: e733a6bb-a580-4279-83d9-057283c5c5d1
+- type: Object
+  relationruleconditions:
+  - relation: объект
+    partofspeach: имя_существительное
+    case: винительный_падеж
+    control: root
+    pretext: ""
+    animated: ""
+    haveobject: ""
+    rootis: []
+    fromrelation: ""
+    actions: []
+    lemma: ""
+    nopretext: false
+    dependrelation: ""
+    id: 02daad04-a53c-47e1-a941-f27171ba4964
+    strangeposition: ""
+    strangedependrelation: ""
+  relationtypes:
+  - relationtype: объект
+    usepretext: false
+    changeroot: 0
+    changeobject: 1
+    changerootbase: 0
+    iscomplex: false
+    iscondition: false
+    iscomma: false
+    isconsequence: false
+    iscomplicate: false
+    actions:
+    - cmd: SaveVar
+      args:
+      - object
+      - val
+    id: 42183978-5784-4dc3-8c1d-cbf5f336e4ec
+  id: 5f22b29f-8b77-4a6c-8f5c-582b71981a42
+- type: Case
+  relationruleconditions:
+  - relation: номинальный_модификатор
+    partofspeach: имя_существительное
+    case: родительный_падеж
+    control: object
+    pretext: из
+    animated: ""
+    haveobject: ""
+    rootis: []
+    fromrelation: ""
+    actions: []
+    lemma: ""
+    nopretext: false
+    dependrelation: ""
+    id: 25ded361-2dd7-4bde-aa81-55b8c47c6bc2
+    strangeposition: ""
+    strangedependrelation: ""
+  relationtypes:
+  - relationtype: сырьё
+    usepretext: false
+    changeroot: 0
+    changeobject: 0
+    changerootbase: 0
+    iscomplex: false
+    iscondition: false
+    iscomma: false
+    isconsequence: false
+    iscomplicate: false
+    actions: []
+    id: be5c39d8-0121-421a-882f-cc7a5d5b062e
+  id: 576be655-c2bf-47ae-b10c-1c6de65c11cc
+- type: Case
+  relationruleconditions:
+  - relation: номинальный_субъект
+    partofspeach: имя_существительное
+    case: ""
+    control: root
+    pretext: ""
+    animated: ""
+    haveobject: ""
+    rootis: []
+    fromrelation: ""
+    actions: []
+    lemma: ""
+    nopretext: false
+    dependrelation: ""
+    id: 95018091-af32-48df-8b4a-9d5c47f75624
+    strangeposition: ""
+    strangedependrelation: ""
+  relationtypes:
+  - relationtype: агент
+    usepretext: false
+    changeroot: 0
+    changeobject: 0
+    changerootbase: 0
+    iscomplex: false
+    iscondition: false
+    iscomma: false
+    isconsequence: false
+    iscomplicate: false
+    actions: []
+    id: 35f1b18f-2c8c-4dbe-b2e6-51fa22630b1a
+  id: 5e081a5f-2640-4fed-a5df-67d13a0e968a
+- type: Extention
+  relationruleconditions:
+  - relation: определение
+    partofspeach: имя_прилагательное
+    case: ""
+    control: by_relation
+    pretext: ""
+    animated: ""
+    haveobject: ""
+    rootis: []
+    fromrelation: ""
+    actions: []
+    lemma: ""
+    nopretext: false
+    dependrelation: ""
+    id: 62a20f52-1b6b-458c-b639-ef3c11680229
+    strangeposition: ""
+    strangedependrelation: ""
+  relationtypes:
+  - relationtype: свойство
+    usepretext: false
+    changeroot: 0
+    changeobject: 0
+    changerootbase: 0
+    iscomplex: false
+    iscondition: false
+    iscomma: false
+    isconsequence: false
+    iscomplicate: false
+    actions: []
+    id: 391e332c-1676-47c2-8f98-1ff7c80646d8
+  id: d497c014-4940-44a5-8279-5c9010a56bec
