@@ -47,7 +47,6 @@ func TestTranslateText(t *testing.T) {
 	require.NoError(t, n.Init())
 	rrs := InitRelationRule()
 	sentence := "студент собрал дом из деталей."
-	//sentence = "руководство это  руководить"
 	tsris, err := TranslateText(n, rrs, sentence, 0)
 	require.NoError(t, err)
 	tsri := TranslateSentensesResultItem{
@@ -152,7 +151,6 @@ func TestTranslateText(t *testing.T) {
 			{Type: "объект", ValuePtr: "", Value: "дом", WordNum: 3},
 			{Type: "агент", ValuePtr: "", Value: "студент", WordNum: 1},
 			{Type: "сырьё", ValuePtr: "", Value: "деталь", WordNum: 5},
-			//{Type: "объект_свойство", ValuePtr: "", Value: "деталь", WordNum: 5},
 		},
 	}
 	expectTsris := []*TranslateSentensesResultItem{

@@ -1,3 +1,10 @@
+if [ ! -f ../cmd/cli/cli ]
+then
+    echo "Service not found"
+    cd ../cmd/cli
+    go build
+    cd ../../scripts
+fi
 ../cmd/cli/cli -file_in=../data/phrases/phrases1.txt -file_out=phrases1_out.txt
 #natasha_tst.exe -file_in=phrases1_1.txt -file_out=phrases1_1_out.txt
 #natasha_tst.exe -file_in=phrases1_2.txt -file_out=phrases1_2_out.txt

@@ -28,8 +28,11 @@ func NewTranslate() *Translate {
 
 func (t *Translate) Init() error {
 	err := t.n.Init()
+	if err != nil {
+		return err
+	}
 	t.isHaveInit = true
-	return err
+	return nil
 }
 
 func (t *Translate) SetRRS(rrs *relations.RelationRules) {

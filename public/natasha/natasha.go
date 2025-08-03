@@ -27,7 +27,7 @@ func NewNatasha() *Natasha {
 		universalDependecies: ud,
 	}
 
-	ocorp.Global_Dict_Init()
+	ocorp.GlobalDictInit()
 	return &n
 }
 
@@ -36,7 +36,7 @@ func (n *Natasha) Init() error {
 	if err != nil {
 		return err
 	}
-	time.Sleep(time.Duration(2) * time.Second)
+	time.Sleep(time.Duration(5) * time.Second)
 	n.isHaveInit = true
 	return nil
 }
@@ -71,21 +71,15 @@ type WordData struct {
 
 func (n *Natasha) ParseSentence(str string) ([]WordData, error) {
 	res, err := n.ExecParseSentence(str)
-	/*
-		res = res[3 : len(res)-2]
-		res_, err := base64.StdEncoding.DecodeString(res)
-		if err != nil {
-			fmt.Printf("error %v\r\n", err)
-			return nil, err
-		}
-		res = string(res_)
-		//fmt.Printf("res %v\r\n", res)
-	*/
+	if err != nil {
+		fmt.Printf("ParseSentence: error %v\r\n", err)
+		return nil, err
+	}
 	var s []map[string]string
 	wds := []WordData{}
 	err = json.Unmarshal([]byte(res), &s)
 	if err != nil {
-		fmt.Printf("error %v\r\n", err)
+		fmt.Printf("ParseSentence: error %v\r\n", err)
 		return nil, err
 	}
 	for i := range s {
@@ -100,29 +94,25 @@ func (n *Natasha) ParseSentence(str string) ([]WordData, error) {
 					wd.Rel = v
 				}
 			case "pos":
-				_, vn := ocorp.Tag2str_attr_int(v)
+				_, vn := ocorp.Tag2StrAttrInt(v)
 				if len(vn) > 0 {
 					wd.Pos = vn
 				} else {
 					wd.Pos = v
 				}
 			case "feats":
-				//				var sr map[string]string
 				var s map[string]string
 				err := json.Unmarshal([]byte(v), &s)
 				if err != nil {
-					fmt.Printf("error %v\r\n", err)
+					fmt.Printf("ParseSentence: error %v\r\n", err)
 					return nil, err
 				}
 				for nn, vv := range s {
 					vv := strings.ToLower(vv)
-					//fmt.Printf("vv %v\r\n", vv)
-					sn, vn := ocorp.Tag2str_attr_ru_int(vv)
+					sn, vn := ocorp.Tag2StrAttrRuInt(vv)
 					if len(vn) > 0 {
-						// fmt.Printf("sn %v, vn %v\r\n", sn, vn)
 						s[sn] = vn
 					} else {
-						// s[sn] = v
 						if false {
 							fmt.Printf("-> %v, %v\r\n", nn, vv)
 						}
@@ -142,12 +132,12 @@ func (n *Natasha) ParseSentence(str string) ([]WordData, error) {
 				sl := strings.Split(v, "_")
 				sn, err := strconv.ParseInt(sl[0], 10, 64)
 				if err != nil {
-					fmt.Printf("error %v\r\n", err)
+					fmt.Printf("ParseSentence: error %v\r\n", err)
 					return nil, err
 				}
 				pn, err := strconv.ParseInt(sl[1], 10, 64)
 				if err != nil {
-					fmt.Printf("error %v\r\n", err)
+					fmt.Printf("ParseSentence: error %v\r\n", err)
 					return nil, err
 				}
 				wd.IdN = int(pn)
@@ -157,18 +147,17 @@ func (n *Natasha) ParseSentence(str string) ([]WordData, error) {
 				sl := strings.Split(v, "_")
 				sn, err := strconv.ParseInt(sl[0], 10, 64)
 				if err != nil {
-					fmt.Printf("error %v\r\n", err)
+					fmt.Printf("ParseSentence: error %v\r\n", err)
 					return nil, err
 				}
 				pn, err := strconv.ParseInt(sl[1], 10, 64)
 				if err != nil {
-					fmt.Printf("error %v\r\n", err)
+					fmt.Printf("ParseSentence: error %v\r\n", err)
 					return nil, err
 				}
 				wd.HeadIdN = int(pn)
 				wd.SheadIdN = int(sn)
 			}
-			//fmt.Printf("%v", res[i])
 		}
 		wds = append(wds, wd)
 	}

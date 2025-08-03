@@ -27,7 +27,12 @@ func main() {
 	rrs := relations.InitRelationRule()
 	fmt.Printf("rules!\r\n")
 	if true {
-		err := relations.LoadSentensesNew(n, rrs, file_in, file_out, 0)
+		err := n.Init()
+		if err != nil {
+			fmt.Printf("error %v\r\n", err)
+			return
+		}
+		err = relations.LoadSentensesNew(n, rrs, file_in, file_out, 0)
 		if err != nil {
 			fmt.Printf("error %v\r\n", err)
 			return
