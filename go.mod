@@ -7,7 +7,7 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.10.0
-	github.com/wanderer69/OpCorpora v0.0.0-20231111094634-28e8d4004d0d
+	github.com/wanderer69/OpCorpora v0.0.0-20250803171639-09a764a6bf47
 	github.com/wanderer69/debug v0.0.0-20230308140515-3e33c36ca2cd
 	github.com/wanderer69/tools v0.0.0-20240428091651-9a7724864412
 	google.golang.org/grpc v1.68.1

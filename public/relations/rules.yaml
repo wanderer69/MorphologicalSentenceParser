@@ -14,7 +14,7 @@ main:
     lemma: ""
     nopretext: false
     dependrelation: ""
-    id: 0e793b53-171b-4085-bcaf-7b5dab87708c
+    id: e3968aad-944c-47b7-ab4a-ea7abb4ad157
     strangeposition: ""
     strangedependrelation: ""
   relationtypes:
@@ -33,8 +33,8 @@ main:
       args:
       - root
       - val
-    id: a5750a01-7df7-42c4-ba09-df984ad9d194
-  id: e733a6bb-a580-4279-83d9-057283c5c5d1
+    id: 8d8cfeba-100e-46e6-b98c-24f40371c416
+  id: e8a7e32e-c3ca-4ff4-a067-bac5d6b749d4
 - type: Object
   relationruleconditions:
   - relation: объект
@@ -50,7 +50,7 @@ main:
     lemma: ""
     nopretext: false
     dependrelation: ""
-    id: 02daad04-a53c-47e1-a941-f27171ba4964
+    id: 03c58eda-e7fe-442a-84a1-bf58006da005
     strangeposition: ""
     strangedependrelation: ""
   relationtypes:
@@ -69,8 +69,8 @@ main:
       args:
       - object
       - val
-    id: 42183978-5784-4dc3-8c1d-cbf5f336e4ec
-  id: 5f22b29f-8b77-4a6c-8f5c-582b71981a42
+    id: 7dd3e195-a1fb-4bf3-8d2b-8d12b53dbe9f
+  id: 2fc0d642-7122-47ba-b4f7-615f281d0f8c
 - type: Case
   relationruleconditions:
   - relation: номинальный_модификатор
@@ -86,7 +86,7 @@ main:
     lemma: ""
     nopretext: false
     dependrelation: ""
-    id: 25ded361-2dd7-4bde-aa81-55b8c47c6bc2
+    id: ff0d0bb7-c7e3-40ab-9807-1c40df755df9
     strangeposition: ""
     strangedependrelation: ""
   relationtypes:
@@ -101,8 +101,8 @@ main:
     isconsequence: false
     iscomplicate: false
     actions: []
-    id: be5c39d8-0121-421a-882f-cc7a5d5b062e
-  id: 576be655-c2bf-47ae-b10c-1c6de65c11cc
+    id: 1fccf5f2-d7bf-4047-8444-88c5ab6b5299
+  id: 102785b5-e6f7-4d32-a795-7f6eebbf236e
 - type: Case
   relationruleconditions:
   - relation: номинальный_субъект
@@ -118,7 +118,7 @@ main:
     lemma: ""
     nopretext: false
     dependrelation: ""
-    id: 95018091-af32-48df-8b4a-9d5c47f75624
+    id: 3928ac87-c03b-4a97-a50a-c76172600428
     strangeposition: ""
     strangedependrelation: ""
   relationtypes:
@@ -133,8 +133,8 @@ main:
     isconsequence: false
     iscomplicate: false
     actions: []
-    id: 35f1b18f-2c8c-4dbe-b2e6-51fa22630b1a
-  id: 5e081a5f-2640-4fed-a5df-67d13a0e968a
+    id: df2b47d3-0613-4ded-8103-90415bf19b5e
+  id: 537e8122-8591-440c-90e1-03cb4d4cf80b
 - type: Extention
   relationruleconditions:
   - relation: определение
@@ -150,7 +150,7 @@ main:
     lemma: ""
     nopretext: false
     dependrelation: ""
-    id: 62a20f52-1b6b-458c-b639-ef3c11680229
+    id: ba1a7c4b-f84d-49b7-af8d-008f10dfd7ac
     strangeposition: ""
     strangedependrelation: ""
   relationtypes:
@@ -165,5 +165,5 @@ main:
     isconsequence: false
     iscomplicate: false
     actions: []
-    id: 391e332c-1676-47c2-8f98-1ff7c80646d8
-  id: d497c014-4940-44a5-8279-5c9010a56bec
+    id: c5b7d59d-9ce9-42b6-9681-e157238edeb3
+  id: 725f676e-31ab-4f73-9252-7491de1ac435

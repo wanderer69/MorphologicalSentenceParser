@@ -1918,25 +1918,27 @@ func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string,
 			} else {
 				res, err := n.ParseSentence(line)
 				if err != nil {
-					return err
+					return fmt.Errorf("LoadSentensesNew : ParseSentence: %w", err)
 				}
 				if len(fileNameOut) > 0 {
 					fmt.Fprintf(f, "> %s\r\n", line)
+					fmt.Printf("> %s\r\n", line)
 					rows := []Row{}
 					for i := range res {
 						rows = TablePrint(rows, i, res[i].Lemma, res[i].Rel, res[i].Pos, res[i].IdN, res[i].HeadIdN, res[i].Feats)
 					}
 					table, err := PrintTable(rows)
 					if err != nil {
-						return err
+						return fmt.Errorf("LoadSentensesNew : PrintTable: %w", err)
 					}
 					for i := range table {
 						fmt.Fprintf(f, "%v\r\n", table[i])
+						fmt.Printf("%v\r\n", table[i])
 					}
 					var rels []*Relation
 					rels, _, _, _, err = CheckRelationByRule(rrs, res)
 					if err != nil {
-						return err
+						return fmt.Errorf("LoadSentensesNew : CheckRelationByRule: %w", err)
 					}
 
 					for i := range rels {

@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -149,9 +151,34 @@ func (nc *NatashaClient) Close() error {
 
 func (nc *NatashaClient) ParsePhrase(ctx context.Context, phrase string) (string, error) {
 	if !nc.isInit {
-		return "", nil
+		return "", fmt.Errorf("ParsePhrase: not initialized")
 	}
-	transport := http.Transport{}
+	transport := http.Transport{
+		//		IdleConnTimeout: time.Duration(30 * time.Second),
+
+		Proxy: http.ProxyFromEnvironment,
+		/*
+			DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
+				runtime.LockOSThread()
+				//setup()
+
+				return net.Dialer{
+					Timeout:   30 * time.Second,
+					KeepAlive: 30 * time.Second,
+					DualStack: true,
+				} .DialContext(ctx, network, address)
+			},
+		*/
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+
+		Dial: (&net.Dialer{
+			Timeout:   40 * time.Second,
+			KeepAlive: 40 * time.Second,
+		}).Dial,
+	}
 	path := fmt.Sprintf("http://%v:%v/phrase-translate", nc.address, internalPort)
 	type Request struct {
 		Phrase string `json:"phrase"`
@@ -161,27 +188,41 @@ func (nc *NatashaClient) ParsePhrase(ctx context.Context, phrase string) (string
 	}
 	data, err := json.Marshal(&request)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ParsePhrase: failed unmarshal %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, bytes.NewReader(data))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ParsePhrase: NewRequestWithContext: %w", err)
 	}
 	client := http.Client{
 		Transport: &transport,
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
+	var resp *http.Response
+	cnt := 5
+	for {
+		resp, err = client.Do(req)
+		if err == nil {
+			break
+		}
+		/*
+			if err != nil {
+				return "", fmt.Errorf("ParsePhrase: Do: failed unmarshal %w", err)
+			}
+		*/
+		cnt = cnt - 1
+		if cnt == 0 {
+			return "", fmt.Errorf("ParsePhrase: Do: failed unmarshal %w", err)
+		}
+		time.Sleep(10 * time.Second)
 	}
 
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ParsePhrase: ReadAll: failed unmarshal %w", err)
 	}
-	fmt.Printf("`%v`\r\n", string(b))
+	fmt.Printf("body `%v`\r\n", string(b))
 
 	type Response struct {
 		Result string `json:"result"`
@@ -189,15 +230,15 @@ func (nc *NatashaClient) ParsePhrase(ctx context.Context, phrase string) (string
 	var response Response
 	err = json.Unmarshal(b, &response)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ParsePhrase: failed unmarshal %w", err)
 	}
 
 	dataRaw, err := base64.StdEncoding.DecodeString(response.Result[2 : len(response.Result)-1])
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ParsePhrase: failed unmarshal %w", err)
 	}
 
-	fmt.Printf("%v\r\n", string(dataRaw))
+	fmt.Printf("data: `%v`\r\n", string(dataRaw))
 
 	return string(dataRaw), nil
 }

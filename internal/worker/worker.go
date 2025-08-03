@@ -90,7 +90,6 @@ func procFunc(ei interface{}, pli interface{}) (interface{}, error) {
 	proc := ei.(*Processor)
 	pl := pli.(*payload)
 
-	//defer n.Close()
 	tsris, err := relations.TranslateText(proc.n, proc.rrs, pl.Sentence, 0)
 	if err != nil {
 		return nil, err
