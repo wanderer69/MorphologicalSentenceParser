@@ -26,9 +26,10 @@ type NatashaClient struct {
 }
 
 const (
-	imageName     = "natasha1:latest"
-	internalPort  = "8888"
-	containerName = "natasha1_"
+	imageName    = "natasha1:latest"
+	internalPort = "8888"
+
+// containerName = "natasha1_"
 )
 
 func NewNatashaClient() *NatashaClient {
