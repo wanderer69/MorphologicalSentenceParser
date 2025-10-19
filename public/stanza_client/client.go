@@ -18,7 +18,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-type NatashaClient struct {
+type StanzaClient struct {
 	isInit  bool
 	cli     *client.Client
 	address string
@@ -26,17 +26,17 @@ type NatashaClient struct {
 }
 
 const (
-	imageName    = "natasha1:latest"
+	imageName    = "stanza_server:latest"
 	internalPort = "8888"
 
 // containerName = "natasha1_"
 )
 
-func NewNatashaClient() *NatashaClient {
-	return &NatashaClient{}
+func NewStanzaClient() *StanzaClient {
+	return &StanzaClient{}
 }
 
-func (nc *NatashaClient) Init() error {
+func (nc *StanzaClient) Init() error {
 	cli, err := client.NewClientWithOpts()
 	if err != nil {
 		return err
@@ -78,31 +78,37 @@ func (nc *NatashaClient) Init() error {
 		return err
 	}
 
+	isRunned := false
 	for i := range containers {
 		fmt.Printf("%#v\r\n", containers[i])
 		if containers[i].Image == imageName {
-			err = cli.ContainerStop(ctx, containers[i].ID, container.StopOptions{})
-			if err != nil {
-				return err
-			}
-			err = cli.ContainerRemove(ctx, containers[i].ID, container.RemoveOptions{})
-			if err != nil {
-				return err
+			isRunned = true
+			if false {
+				err = cli.ContainerStop(ctx, containers[i].ID, container.StopOptions{})
+				if err != nil {
+					return err
+				}
+				err = cli.ContainerRemove(ctx, containers[i].ID, container.RemoveOptions{})
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image:        imageName,
-		ExposedPorts: nat.PortSet{internalPort: struct{}{}},
-	}, &container.HostConfig{
-		PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("8188"): {{HostIP: "127.0.0.1", HostPort: internalPort}}},
-	}, &network.NetworkingConfig{}, nil, "test1")
-	if err != nil {
-		return err
-	}
+	if !isRunned {
+		resp, err := cli.ContainerCreate(ctx, &container.Config{
+			Image:        imageName,
+			ExposedPorts: nat.PortSet{internalPort: struct{}{}},
+		}, &container.HostConfig{
+			PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("8188"): {{HostIP: "127.0.0.1", HostPort: internalPort}}},
+		}, &network.NetworkingConfig{}, nil, "stanza_server")
+		if err != nil {
+			return err
+		}
 
-	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
-		return err
+		if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+			return err
+		}
 	}
 	containers, err = cli.ContainerList(ctx, container.ListOptions{})
 	if err != nil {
@@ -117,14 +123,17 @@ func (nc *NatashaClient) Init() error {
 				return err
 			}
 			fmt.Printf("info %v\r\n", info)
-			nc.address = info.NetworkSettings.IPAddress
+			for k, v := range info.NetworkSettings.Networks {
+				fmt.Printf("--> %v %v\r\n", k, v)
+				nc.address = v.IPAddress
+			}
 		}
 	}
 	nc.isInit = true
 	return nil
 }
 
-func (nc *NatashaClient) Close() error {
+func (nc *StanzaClient) Close() error {
 	if !nc.isInit {
 		return nil
 	}
@@ -137,20 +146,22 @@ func (nc *NatashaClient) Close() error {
 	for i := range containers {
 		fmt.Printf("%#v\r\n", containers[i])
 		if containers[i].Image == imageName {
-			err = nc.cli.ContainerStop(ctx, containers[i].ID, container.StopOptions{})
-			if err != nil {
-				return err
-			}
-			err = nc.cli.ContainerRemove(ctx, containers[i].ID, container.RemoveOptions{})
-			if err != nil {
-				return err
+			if false {
+				err = nc.cli.ContainerStop(ctx, containers[i].ID, container.StopOptions{})
+				if err != nil {
+					return err
+				}
+				err = nc.cli.ContainerRemove(ctx, containers[i].ID, container.RemoveOptions{})
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 	return nil
 }
 
-func (nc *NatashaClient) ParsePhrase(ctx context.Context, phrase string) (string, error) {
+func (nc *StanzaClient) ParsePhrase(ctx context.Context, phrase string) (string, error) {
 	if !nc.isInit {
 		return "", fmt.Errorf("ParsePhrase: not initialized")
 	}

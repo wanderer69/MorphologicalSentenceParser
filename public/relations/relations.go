@@ -13,6 +13,7 @@ import (
 	"github.com/wanderer69/debug"
 	"gopkg.in/yaml.v2"
 
+	"github.com/wanderer69/MorphologicalSentenceParser/public/entity"
 	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
 )
 
@@ -263,6 +264,7 @@ type RelationRuleItem struct {
 	RelationRuleConditions []RelationRuleCondition // условие и
 	RelationTypes          []RelationType
 	ID                     string
+	Name                   string
 }
 
 func (rri *RelationRuleItem) SetID() {
@@ -336,31 +338,31 @@ Type:
 
 func InitRelationRule() *RelationRules {
 	rrs := RelationRules{}
-	rri := RelationRuleItem{Type: "Root", RelationTypes: []RelationType{{RelationType: RAction, ChangeRoot: 1, Actions: NewAction("SaveVar", "root", "val").Actions}}}
+	rri := RelationRuleItem{Name: "действие", Type: "Root", RelationTypes: []RelationType{{RelationType: RAction, ChangeRoot: 1, Actions: NewAction("SaveVar", "root", "val").Actions}}}
 	rr := RelationRuleCondition{Relation: "основа", PartOfSpeach: "глагол_личная_форма", Case: "", Control: "zero", Pretext: "", Animated: "", HaveObject: ""}
 	rri.RelationRuleConditions = append(rri.RelationRuleConditions, rr)
 	(&rri).SetID()
 	rrs.Main = append(rrs.Main, rri)
 
-	rri = RelationRuleItem{Type: "Object", RelationTypes: []RelationType{{RelationType: RObject, ChangeObject: 1, Actions: NewAction("SaveVar", "object", "val").Actions}}}
+	rri = RelationRuleItem{Name: "объект", Type: "Object", RelationTypes: []RelationType{{RelationType: RObject, ChangeObject: 1, Actions: NewAction("SaveVar", "object", "val").Actions}}}
 	rr = RelationRuleCondition{Relation: "объект", PartOfSpeach: "имя_существительное", Case: "винительный_падеж", Control: "root", Pretext: "", Animated: "", HaveObject: ""}
 	rri.RelationRuleConditions = append(rri.RelationRuleConditions, rr)
 	(&rri).SetID()
 	rrs.Main = append(rrs.Main, rri)
 
-	rri = RelationRuleItem{Type: "Case", RelationTypes: []RelationType{{RelationType: RRawMaterial}}}
-	rr = RelationRuleCondition{Relation: "номинальный_модификатор", PartOfSpeach: "имя_существительное", Case: "родительный_падеж", Control: "object", Animated: "", Pretext: "из", HaveObject: ""}
+	rri = RelationRuleItem{Name: "сырье", Type: "Case", RelationTypes: []RelationType{{RelationType: RRawMaterial}}}
+	rr = RelationRuleCondition{Relation: "объект_локальный", PartOfSpeach: "имя_существительное", Case: "родительный_падеж", Control: "root", Animated: "неодушевлённое", Pretext: "из", HaveObject: ""}
 	rri.RelationRuleConditions = append(rri.RelationRuleConditions, rr)
 	(&rri).SetID()
 	rrs.Main = append(rrs.Main, rri)
 
-	rri = RelationRuleItem{Type: "Case", RelationTypes: []RelationType{{RelationType: RAgent}}}
+	rri = RelationRuleItem{Name: "агент", Type: "Case", RelationTypes: []RelationType{{RelationType: RAgent}}}
 	rr = RelationRuleCondition{Relation: "номинальный_субъект", PartOfSpeach: "имя_существительное", Case: "", Control: "root", Animated: "", Pretext: "", HaveObject: ""}
 	rri.RelationRuleConditions = append(rri.RelationRuleConditions, rr)
 	(&rri).SetID()
 	rrs.Main = append(rrs.Main, rri)
 
-	rri = RelationRuleItem{Type: "Extention", RelationTypes: []RelationType{{RelationType: RProperty}}}
+	rri = RelationRuleItem{Name: "свойство", Type: "Extention", RelationTypes: []RelationType{{RelationType: RProperty}}}
 	rr = RelationRuleCondition{Relation: "определение", PartOfSpeach: "имя_прилагательное", Case: "", Control: "by_relation", Pretext: "", Animated: "", HaveObject: ""} // , FromRelation: "RObject"
 	rri.RelationRuleConditions = append(rri.RelationRuleConditions, rr)
 	(&rri).SetID()
@@ -533,7 +535,7 @@ func remove[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func Predicate(mode string, rria []RelationRuleItem, currentWord int, re *RelationEnv, wd []natasha.WordData) *Relation {
+func Predicate(mode string, rria []RelationRuleItem, currentWord int, re *RelationEnv, wd []entity.WordData) *Relation {
 	var r *Relation
 	r = nil
 	isModeExists := false
@@ -548,6 +550,10 @@ func Predicate(mode string, rria []RelationRuleItem, currentWord int, re *Relati
 
 		currentRule := re.posRRIA
 		if rria[currentRule].Type == mode {
+			if rria[currentRule].Name == "сырье" && currentWord == 6 {
+				fmt.Printf("--> %v\r\n", rria[currentRule].Name)
+			}
+
 			//fmt.Printf("!!!! rule id %v\r\n", rria[currentRule].ID)
 			if rria[currentRule].ID == "eeb9fb49-aca9-4d1f-96b8-eb101f03ef39" {
 				if currentWord == 1 {
@@ -1058,534 +1064,7 @@ func Predicate(mode string, rria []RelationRuleItem, currentWord int, re *Relati
 	return r
 }
 
-func CheckRelationByRule(rrs *RelationRules, wd []natasha.WordData) ([]*Relation, int, int, int, error) {
-	/*
-		// функция предиката
-		predicate := func(mode string, rria []RelationRuleItem, currentWord int, re *RelationEnv) *Relation {
-			var r *Relation
-			r = nil
-			isModeExists := false
-			debug.Alias("level1.1").Printf("\t\tpredicate mode %v wd[i] %v %v pos_in_rrc %v re.pos_rria %v\r\n", mode, wd[currentWord].Text, wd[currentWord].Rel, re.posInRRC, re.posRRIA)
-			//fmt.Printf("predicate i %v\r\n", i)
-			//fmt.Printf("predicate %v %v\r\n", i, wd[i].Text)
-			//fmt.Printf("predicate %v %v \r\n", i, wd[i].Rel)
-			for {
-				state := 0
-				ptr := -1
-				flagBreak := false
-
-				currentRule := re.posRRIA
-				if rria[currentRule].Type == mode {
-					fmt.Printf("!!!! rule id %v\r\n", rria[currentRule].ID)
-					if rria[currentRule].ID == "eeb9fb49-aca9-4d1f-96b8-eb101f03ef39" {
-						if currentWord == 1 {
-							fmt.Printf("!!!!!!\r\n")
-						}
-					}
-					if false
-						if mode == "Root" {
-							fmt.Printf("%v\r\n", mode)
-						}
-					}
-					if false
-						if mode == "Pre" {
-							fmt.Printf("%v\r\n", mode)
-						}
-					}
-
-					isModeExists = true
-					rrcl := rria[currentRule].RelationRuleConditions
-					// fmt.Printf("predicate re.pos_rria %v re.pos_in_rrc %v\r\n", re.posRRIA, re.posInRRC)
-
-					if re.CheckRelationUse(rrcl[re.posInRRC], currentWord) {
-						// fmt.Printf("CheckRelationUse true\r\n")
-						if re.posInRRC >= 0 {
-							re.state = -3
-							state = 15
-							break
-						} else {
-							if len(rria)-1 > re.posRRIA {
-								re.posRRIA = re.posRRIA + 1
-							} else {
-								break
-							}
-							continue
-						}
-					}
-					//fmt.Printf("rrcl %v re.pos_rria %v\r\n", rrcl, re.pos_rria)
-					rr := rrcl[re.posInRRC]
-
-					prev := -1
-					prev_ptr := 0
-					debug.Alias("level1").Printf("predicate rr %#v\r\n", rr)
-					for {
-						debug.Alias("level2").Printf("predicate state %v ptr %v\r\n", state, ptr)
-						if prev == state {
-							prev_ptr = prev_ptr + 1
-							if prev_ptr > 5 {
-								panic("problem!")
-							}
-						} else {
-							prev_ptr = 0
-							prev = state
-						}
-						switch state {
-						case 0:
-							if len(rr.Relation) > 0 {
-								//fmt.Printf("rr.Relation %v, wd[i].Rel %v, rr.Relation == wd[i].Rel %v\r\n", rr.Relation, wd[i].Rel, rr.Relation == wd[i].Rel)
-								if rr.Relation == wd[currentWord].Rel {
-									state = 1
-								} else {
-									state = 20
-								}
-							} else {
-								state = 1
-							}
-						case 1:
-							if len(rr.PartOfSpeach) > 0 {
-								if rr.PartOfSpeach == wd[currentWord].Pos {
-									state = 2
-								} else {
-									state = 20
-								}
-							} else {
-								state = 2
-							}
-						case 2:
-							if len(rr.Case) > 0 {
-								v, ok := wd[currentWord].Feats["падеж"]
-								if ok {
-									if v == rr.Case {
-										state = 3
-									} else {
-										state = 20
-									}
-								} else {
-									state = 20
-								}
-							} else {
-								state = 3
-							}
-						case 3:
-							// проверяем управление
-							if len(rr.Control) > 0 {
-								switch rr.Control {
-								case "zero":
-									if wd[currentWord].HeadIdN == 0 {
-										state = 4
-									} else {
-										state = 20
-									}
-								case "self":
-									if wd[currentWord].HeadIdN == wd[currentWord].IdN {
-										state = 4
-									} else {
-										state = 20
-									}
-								case "root":
-									if re.root < 0 {
-										state = 20
-									} else {
-										if wd[currentWord].HeadIdN == wd[re.root].IdN {
-											state = 4
-										} else {
-											state = 20
-										}
-									}
-								case "object":
-									if re.object < 0 {
-										state = 20
-									} else {
-										if wd[currentWord].HeadIdN == wd[re.object].IdN {
-											state = 4
-										} else {
-											state = 20
-										}
-									}
-								case "root_base":
-									if re.rootBase < 0 {
-										state = 20
-									} else {
-										if wd[currentWord].HeadIdN == wd[re.rootBase].IdN {
-											state = 4
-										} else {
-											state = 20
-										}
-									}
-								case "by_relation":
-									// цикл по известным отношениям
-									flagBreak := true
-									for ii := range re.Relations {
-										debug.Alias("level3").Printf("re.Relations[i] %v, wd[i].HeadIdN %v\r\n", re.Relations[ii], wd[currentWord].HeadIdN)
-										if re.Relations[ii].WordNum == wd[currentWord].HeadIdN {
-											state = 4
-											re.CurrentRelation = re.Relations[ii]
-											flagBreak = false
-											break
-										}
-									}
-									if flagBreak {
-										state = 20
-									}
-								case "stack":
-									// fmt.Printf("re.stack %#v\r\n", re.stack)
-									if len(re.stack) == 0 {
-										state = 20
-									} else {
-										// fmt.Printf("wd[i].HeadIdN %v, wd[re.stack[0].data].IdN %v, wd[i].HeadIdN == wd[re.stack[0].data].IdN %v\r\n", wd[i].HeadIdN, wd[re.stack[0].data].IdN, wd[i].HeadIdN == wd[re.stack[0].data].IdN)
-										if wd[currentWord].HeadIdN == wd[re.stack[0].data].IdN {
-											state = 4
-										} else {
-											state = 20
-										}
-									}
-								}
-							} else {
-								state = 4
-							}
-						case 4:
-							if len(rr.Animated) > 0 {
-								// проверяем одушевленность
-								dd, ok := wd[currentWord].Feats["одушевлённость"]
-								if !ok {
-									state = 20
-								} else {
-									if dd == rr.Animated {
-										state = 5
-									} else {
-										state = 20
-									}
-								}
-							} else {
-								state = 5
-							}
-						case 5:
-							if len(rr.HaveObject) > 0 {
-								switch rr.HaveObject {
-								case "object":
-									if re.object < 0 {
-										state = 20
-									} else {
-										if wd[currentWord].HeadIdN == wd[re.object].HeadIdN {
-											state = 6
-										} else {
-											state = 20
-										}
-									}
-								case "is_object":
-									if re.object < 0 {
-										state = 6
-									} else {
-										state = 20
-									}
-								}
-							} else {
-								state = 6
-							}
-						case 6:
-							if len(rr.RootIs) > 0 {
-								flag_nn := true
-								for nn := range rr.RootIs {
-									switch nn {
-									case 0:
-										// проверим что root - на самом деле - агент - имя существительное
-										if len(rr.RootIs[nn]) > 0 {
-											vv, ok := wd[re.root].Feats["падеж"]
-											if ok {
-												if vv == "именительный_падеж" {
-												} else {
-													flag_nn = false
-												}
-											} else {
-												flag_nn = false
-											}
-										}
-									case 1:
-										if len(rr.RootIs[nn]) > 0 {
-											// проверим, что root одушевленный
-											vvv, ok := wd[re.root].Feats["одушевлённость"]
-											if ok {
-												if vvv == "одушевлённое" {
-
-												} else {
-													flag_nn = false
-												}
-											} else {
-												flag_nn = false
-											}
-										}
-									}
-									if !flag_nn {
-										break
-									}
-								}
-								if flag_nn {
-									// совпадает
-									state = 7
-								} else {
-									state = 20
-								}
-							} else {
-								state = 7
-							}
-						case 7:
-							if len(rr.Lemma) > 0 {
-								// проверяем лемму
-								if wd[currentWord].Lemma == rr.Lemma {
-									state = 8
-								} else {
-									state = 20
-								}
-							} else {
-								state = 8
-							}
-
-						case 8:
-							if rr.NoPretext {
-								if len(rr.Pretext) > 0 {
-									// надо проверить что может быть предлог rr.Pretext
-									flag := true
-									for j := currentWord - 1; j >= 0; j-- {
-										if wd[j].Rel == "указатель" {
-											//fmt.Printf("wd[j].HeadIdN %v, wd[i].IdN %v, wd[j].HeadIdN == wd[i].IdN %v\r\n", wd[j].HeadIdN, wd[i].IdN, wd[j].HeadIdN == wd[i].IdN)
-											if wd[j].HeadIdN == wd[currentWord].IdN {
-												//fmt.Printf("wd[j] %#v, rr.Pretext %v, wd[j].Text == rr.Pretext %v\r\n", wd[j], rr.Pretext, wd[j].Text == rr.Pretext)
-												if wd[j].Lemma == rr.Pretext {
-													state = 20
-													flag = false
-													break
-												}
-											}
-										}
-									}
-									if flag {
-										state = 9
-									}
-								} else {
-									// надо проверить что может быть предлог rr.Pretext
-									flag := true
-									for j := currentWord - 1; j >= 0; j-- {
-										if wd[j].Rel == "указатель" {
-											//fmt.Printf("wd[j].HeadIdN %v, wd[i].IdN %v, wd[j].HeadIdN == wd[i].IdN %v\r\n", wd[j].HeadIdN, wd[i].IdN, wd[j].HeadIdN == wd[i].IdN)
-											if wd[j].HeadIdN == wd[currentWord].IdN {
-												state = 20
-												flag = false
-												break
-											}
-										}
-									}
-									if flag {
-										state = 9
-									}
-								}
-							} else {
-								state = 9
-							}
-
-						case 9:
-							//fmt.Printf("rr.DependRelation %v\r\n", rr.DependRelation)
-							if len(rr.DependRelation) > 0 {
-								flag := true
-								// ищем зависимость до
-								for j := 0; j < len(wd)-1; j++ {
-									//fmt.Printf("rr.DependRelation %v, wd[j].Rel %v\r\n", rr.DependRelation, wd[j].Rel)
-									if rr.DependRelation == wd[j].Rel {
-										//fmt.Printf("wd[j].HeadIdN %v, wd[i].IdN %v, wd[j].HeadIdN == wd[i].IdN %v\r\n", wd[j].HeadIdN, wd[i].IdN, wd[j].HeadIdN == wd[i].IdN)
-										if wd[currentWord].HeadIdN == wd[j].IdN {
-											//fmt.Printf("wd[j] %#v, rr.Pretext %v, wd[j].Text == rr.Pretext %v\r\n", wd[j], rr.Pretext, wd[j].Text == rr.Pretext)
-											ptr = j
-											state = 10
-											flag = false
-											break
-										}
-									}
-								}
-								if flag {
-									state = 20
-								}
-							} else {
-								state = 10
-							}
-
-						case 10:
-							if len(rr.Pretext) > 0 {
-								// надо проверить что может быть предлог rr.Pretext
-								flag := true
-								for j := currentWord - 1; j >= 0; j-- {
-									if wd[j].Rel == "указатель" {
-										//fmt.Printf("wd[j].HeadIdN %v, wd[i].IdN %v, wd[j].HeadIdN == wd[i].IdN %v\r\n", wd[j].HeadIdN, wd[i].IdN, wd[j].HeadIdN == wd[i].IdN)
-										if wd[j].HeadIdN == wd[currentWord].IdN {
-											//fmt.Printf("wd[j] %#v, rr.Pretext %v, wd[j].Text == rr.Pretext %v\r\n", wd[j], rr.Pretext, wd[j].Text == rr.Pretext)
-											if wd[j].Lemma == rr.Pretext {
-												ptr = j
-												state = 11
-												flag = false
-												break
-											}
-										}
-									}
-								}
-								if flag {
-									state = 20
-								}
-							} else {
-								state = 11
-							}
-
-						case 11:
-							if len(rr.StrangePosition) > 0 {
-								// надо проверить что может быть непосредственная позиция
-								state = 20
-								spos, err := strconv.ParseInt(rr.StrangePosition, 10, 32)
-								if err == nil {
-									if wd[currentWord].IdN == int(spos) {
-										state = 12
-									}
-								}
-							} else {
-								state = 12
-							}
-
-						case 12:
-							//fmt.Printf("rr.DependRelation %v\r\n", rr.DependRelation)
-							if len(rr.StrangeDependRelation) > 0 {
-								flag := true
-								// ищем зависимость до
-								for j := 0; j < len(wd)-1; j++ {
-									//fmt.Printf("rr.DependRelation %v, wd[j].Rel %v\r\n", rr.DependRelation, wd[j].Rel)
-									if rr.StrangeDependRelation == wd[j].Rel {
-										ptr = j
-										state = 15
-										flag = false
-										break
-									}
-								}
-								if flag {
-									state = 20
-								}
-							} else {
-								state = 15
-							}
-
-						case 15:
-							//
-							//fmt.Printf("predicate len(rrcl)- 1 > re.posInRRC %v\r\n", len(rrcl)-1 > re.posInRRC)
-							if len(rrcl)-1 > re.posInRRC {
-								// изменяем состояние и выходим
-								p := Pair{currentRule, re.posInRRC, currentWord}
-								re.stack = append(re.stack, p)
-								if re.state < 0 {
-									re.state = 0
-								} else {
-									re.state = re.state + 1
-								}
-								re.posInRRC = re.posInRRC + 1
-							} else {
-								p := Pair{currentRule, re.posInRRC, currentWord}
-								re.stack = append(re.stack, p)
-								// получилось сопоставить
-								if mode == "Pre" {
-									posCondition := -1
-									posComma := -1
-									posCosequence := -1
-									posComplicate := -1
-									for j := range rria[currentRule].RelationTypes {
-										if rria[currentRule].RelationTypes[j].IsComplex {
-											if rria[currentRule].RelationTypes[j].IsCondition {
-												posCondition = re.stack[j].data
-											}
-											if rria[currentRule].RelationTypes[j].IsComma {
-												posComma = re.stack[j].data
-											}
-											if rria[currentRule].RelationTypes[j].IsConsequence {
-												posCosequence = re.stack[j].data
-											}
-											if rria[currentRule].RelationTypes[j].IsComplicate {
-												posComplicate = re.stack[j].data
-											}
-										}
-									}
-									//debug.Alias("level4.1").Printf("posCondition %v, posComma %v, posCosequence %v\r\n", posCondition, posComma, posCosequence)
-									cp := ComplexPair{}
-									cp.BeginMain = posCondition + 1
-									cp.EndMain = posComma - 1
-									cp.BeginCondition = posCosequence + 1
-									cp.EndCondition = len(wd) - 1
-									cp.Complicate = posComplicate
-
-									cp.PosCondition = posCondition
-									cp.PosComma = posComma
-									cp.PosCosequence = posCosequence
-
-									debug.Alias("level4.1").Printf("predicate cp %#v\r\n", cp)
-									re.Complex = &cp
-								}
-								for j := range rria[currentRule].RelationTypes {
-									if rria[currentRule].RelationTypes[j].ChangeRoot > 0 {
-										p := rria[currentRule].RelationTypes[j].ChangeRoot - 1
-										re.root = re.stack[p].data
-									}
-									if rria[currentRule].RelationTypes[j].ChangeRootBase > 0 {
-										p := rria[currentRule].RelationTypes[j].ChangeRootBase - 1
-										re.rootBase = re.stack[p].data
-									}
-									if rria[currentRule].RelationTypes[j].ChangeObject > 0 {
-										p := rria[currentRule].RelationTypes[j].ChangeObject - 1
-										re.object = re.stack[p].data
-									}
-									if len(rria[currentRule].RelationTypes[j].RelationType) > 0 {
-										if rria[currentRule].RelationTypes[j].UsePretext {
-											r = &Relation{Type: rria[currentRule].RelationTypes[j].RelationType, Value: wd[re.stack[j].data].Lemma, ValuePtr: wd[re.stack[j].data].Lemma, WordNum: wd[re.stack[j].data].IdN, Relation: re.CurrentRelation}
-											re.Relations = append(re.Relations, r)
-										} else {
-											r = &Relation{Type: rria[currentRule].RelationTypes[j].RelationType, Value: wd[re.stack[j].data].Lemma, WordNum: wd[re.stack[j].data].IdN, Relation: re.CurrentRelation}
-											re.Relations = append(re.Relations, r)
-										}
-									}
-								}
-								for iii := range re.stack {
-									rrclNew := rria[re.stack[iii].rule].RelationRuleConditions
-									rrNew := rrclNew[re.stack[iii].posInRule]
-									re.AddRelationUse(rrNew, re.stack[iii].data)
-								}
-								debug.Alias("level4").Printf("predicate re.Relations %v\r\n", re.Relations)
-								re.state = -2
-							}
-							flagBreak = true
-						case 20:
-							if len(re.stack) > 0 {
-								state = 15
-								if re.posInRRC > 0 {
-
-								} else {
-									if len(rria)-1 > re.posRRIA {
-										re.posRRIA = re.posRRIA + 1
-									}
-								}
-							}
-							re.state = -3
-							flagBreak = true
-						}
-						if flagBreak {
-							break
-						}
-					}
-				}
-				if state == 15 {
-					break
-				}
-				if len(rria)-1 > re.posRRIA {
-					re.posRRIA = re.posRRIA + 1
-				} else {
-					break
-				}
-			}
-			if !isModeExists {
-				re.state = -3
-			}
-			return r
-		}
-	*/
+func CheckRelationByRule(rrs *RelationRules, wd []entity.WordData) ([]*Relation, int, int, int, error) {
 	// проверяем на рут
 	re := NewRelationEnv()
 
@@ -1977,7 +1456,7 @@ func LoadSentensesNew(n *natasha.Natasha, rrs *RelationRules, fileNameIn string,
 
 type TranslateSentensesResultItem struct {
 	Sentence    string
-	WordsData   []natasha.WordData
+	WordsData   []entity.WordData
 	Relations   []*Relation
 	RootPos     int
 	ObjectPos   int
@@ -2030,7 +1509,14 @@ func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug 
 	return tsris, nil
 }
 
-func TranslateSentence(n *natasha.Natasha, rrs *RelationRules, sentence string, debug int) (*TranslateSentensesResultItem, error) {
+type translate interface {
+	Close()
+	ExecParseSentence(sentence string) (string, error)
+	Init() error
+	ParseSentence(str string) ([]entity.WordData, error)
+}
+
+func TranslateSentence(n translate, rrs *RelationRules, sentence string, debug int) (*TranslateSentensesResultItem, error) {
 	isPrint := false
 	line := strings.TrimSpace(sentence)
 	line = strings.ToLower(line)

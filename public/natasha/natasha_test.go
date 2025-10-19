@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/entity"
 )
 
 func TestNewNatasha(t *testing.T) {
@@ -16,7 +17,7 @@ func TestNewNatasha(t *testing.T) {
 	require.True(t, len(str) > 0)
 	wordData, err := n.ParseSentence("лес растёт на холме")
 	require.NoError(t, err)
-	expectedWordData := []WordData{
+	expectedWordData := []entity.WordData{
 		{
 			Rel:      "номинальный_субъект",
 			Pos:      "имя_существительное",

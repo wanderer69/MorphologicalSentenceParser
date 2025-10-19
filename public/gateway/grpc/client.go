@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	pb "github.com/wanderer69/MorphologicalSentenceParser/pkg/server/grpc/morphological_parser"
-	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/entity"
 	"github.com/wanderer69/MorphologicalSentenceParser/public/relations"
 )
 
@@ -78,7 +78,7 @@ func GrpcParsePhrase(conn *grpcGoogle.ClientConn, taskID string) (string, []*rel
 		}
 		for j := range r.WordDatas {
 			wd := r.WordDatas[j]
-			WordsData := natasha.WordData{
+			WordsData := entity.WordData{
 				Rel:      wd.Rel,
 				Pos:      wd.Pos,
 				Feats:    wd.Feats,
