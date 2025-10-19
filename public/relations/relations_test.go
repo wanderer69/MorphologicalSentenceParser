@@ -7,10 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/wanderer69/debug"
 
+	"github.com/wanderer69/MorphologicalSentenceParser/public/entity"
 	"github.com/wanderer69/MorphologicalSentenceParser/public/natasha"
+	"github.com/wanderer69/MorphologicalSentenceParser/public/stanza"
 )
 
-func TestRelations(t *testing.T) {
+func TestRelationsWithNatasha(t *testing.T) {
 	debug.NewDebug()
 	//debug.LoadFromFile("debug.cfg")
 
@@ -27,7 +29,7 @@ func TestRelations(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestRelationsStoreToScript(t *testing.T) {
+func TestRelationsStoreToScriptWithNatasha(t *testing.T) {
 	debug.NewDebug()
 
 	n := natasha.NewNatasha()
@@ -38,7 +40,7 @@ func TestRelationsStoreToScript(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestTranslateText(t *testing.T) {
+func TestTranslateTextWithNatasha(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
@@ -54,7 +56,7 @@ func TestTranslateText(t *testing.T) {
 		RootPos:     1,
 		ObjectPos:   2,
 		RootBasePos: -1,
-		WordsData: []natasha.WordData{
+		WordsData: []entity.WordData{
 			{
 				Rel:      "номинальный_субъект",
 				Pos:      "имя_существительное",
@@ -160,7 +162,7 @@ func TestTranslateText(t *testing.T) {
 	require.Equal(t, *expectTsris[0], *tsris[0])
 }
 
-func TestTranslateSentense(t *testing.T) {
+func TestTranslateSentenseWithNatasha(t *testing.T) {
 	debug.NewDebug()
 	debug.LoadFromFile("../../cmd/cli/debug.cfg")
 
@@ -171,6 +173,35 @@ func TestTranslateSentense(t *testing.T) {
 
 	sentence := "студент собрал дом из деталей."
 	//sentence = "руководство это  руководить"
+	sentence = "умный студент построил разумного робота из деталей"
+	tsri, err := TranslateSentence(n, rrs, sentence, 0)
+	require.NoError(t, err)
+
+	fmt.Printf("-------------------------------\r\n")
+	fmt.Printf("%v\r\n", tsri.Sentence)
+	fmt.Printf("root %v object %v rootBase %v\r\n", tsri.RootPos, tsri.ObjectPos, tsri.RootBasePos)
+	for j := range tsri.WordsData {
+		fmt.Printf("rel %v lemma %v POS %v case %v\r\n", tsri.WordsData[j].Rel, tsri.WordsData[j].Lemma, tsri.WordsData[j].Pos, tsri.WordsData[j].Feats["падеж"])
+	}
+	for j := range tsri.Relations {
+		fmt.Printf("%#v\r\n", tsri.Relations[j])
+	}
+
+	require.True(t, true)
+}
+
+func TestTranslateSentenseWithStanza(t *testing.T) {
+	debug.NewDebug()
+	debug.LoadFromFile("../../cmd/cli/debug.cfg")
+
+	n := stanza.NewStanza()
+	defer n.Close()
+	require.NoError(t, n.Init())
+	rrs := InitRelationRule()
+
+	sentence := "студент собрал дом из деталей."
+	//sentence = "руководство это  руководить"
+	sentence = "умный студент построил разумного робота из деталей"
 	tsri, err := TranslateSentence(n, rrs, sentence, 0)
 	require.NoError(t, err)
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wanderer69/MorphologicalSentenceParser/public/entity"
 	natashaclient "github.com/wanderer69/MorphologicalSentenceParser/public/natasha_client"
 	universaldependencies "github.com/wanderer69/MorphologicalSentenceParser/public/universal_dependencies"
 	ocorp "github.com/wanderer69/OpCorpora/public/opcorpora"
@@ -53,37 +54,21 @@ func (n *Natasha) Close() {
 	n.natashaClient.Close()
 }
 
-type WordData struct {
-	Rel      string
-	Pos      string
-	Feats    map[string]string
-	Start    string
-	Stop     string
-	Text     string
-	Lemma    string
-	Id       string
-	HeadID   string
-	IdN      int
-	SidN     int
-	HeadIdN  int
-	SheadIdN int
-}
-
-func (n *Natasha) ParseSentence(str string) ([]WordData, error) {
+func (n *Natasha) ParseSentence(str string) ([]entity.WordData, error) {
 	res, err := n.ExecParseSentence(str)
 	if err != nil {
 		fmt.Printf("ParseSentence: error %v\r\n", err)
 		return nil, err
 	}
 	var s []map[string]string
-	wds := []WordData{}
+	wds := []entity.WordData{}
 	err = json.Unmarshal([]byte(res), &s)
 	if err != nil {
 		fmt.Printf("ParseSentence: error %v\r\n", err)
 		return nil, err
 	}
 	for i := range s {
-		wd := WordData{}
+		wd := entity.WordData{}
 		for k, v := range s[i] {
 			switch k {
 			case "rel":
