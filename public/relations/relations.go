@@ -1509,14 +1509,14 @@ func TranslateText(n *natasha.Natasha, rrs *RelationRules, str_in string, debug 
 	return tsris, nil
 }
 
-type translate interface {
+type Translate interface {
 	Close()
 	ExecParseSentence(sentence string) (string, error)
 	Init() error
 	ParseSentence(str string) ([]entity.WordData, error)
 }
 
-func TranslateSentence(n translate, rrs *RelationRules, sentence string, debug int) (*TranslateSentensesResultItem, error) {
+func TranslateSentence(n Translate, rrs *RelationRules, sentence string, debug int) (*TranslateSentensesResultItem, error) {
 	isPrint := false
 	line := strings.TrimSpace(sentence)
 	line = strings.ToLower(line)
